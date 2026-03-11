@@ -540,9 +540,17 @@
         Import Docs
       </li>
       <li class="sidebar__section">System</li>
+      <li class="sidebar__item" data-page="site-config" onclick="switchPage('site-config', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Site Config
+      </li>
+      <li class="sidebar__item" data-page="deploy" onclick="switchPage('deploy', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+        Deploy
+      </li>
       <li class="sidebar__item" data-page="export" onclick="switchPage('export', this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        Export / Save
+        Export Files
       </li>
     </ul>
   </aside>
@@ -693,6 +701,7 @@
           <button class="tab-btn" onclick="switchTab(this,'cs-tab-content')">Content</button>
           <button class="tab-btn" onclick="switchTab(this,'cs-tab-images')">Images</button>
           <button class="tab-btn" onclick="switchTab(this,'cs-tab-links')">Figma / Framer</button>
+          <button class="tab-btn" onclick="switchTab(this,'cs-tab-aigen')">AI Images</button>
         </div>
 
         <div class="tab-panel active" id="cs-tab-meta">
@@ -770,10 +779,53 @@
             <div class="form-help">Add any other project links as a JSON array. These will be stored in the manifest.</div>
           </div>
         </div>
+
+        <div class="tab-panel" id="cs-tab-aigen">
+          <p style="font-size:0.85rem;color:var(--text-2);margin-bottom:1rem">
+            Generate contextual images for this case study using AI. Results are saved to your images folder.
+          </p>
+          <div class="form-group">
+            <label class="form-label">Image prompt</label>
+            <textarea class="form-textarea" id="cs-ai-prompt" rows="3" placeholder="A clean, minimal wireframe mockup of a hotel booking interface on a dark background, professional UI design screenshot style"></textarea>
+            <div class="form-help">Describe the image you want. Be specific about style, content, and mood. The AI generates project-contextual visuals.</div>
+          </div>
+          <div class="form-row-3">
+            <div class="form-group">
+              <label class="form-label">Width</label>
+              <input class="form-input" id="cs-ai-width" type="number" value="1024">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Height</label>
+              <input class="form-input" id="cs-ai-height" type="number" value="768">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Provider</label>
+              <select class="form-select" id="cs-ai-provider">
+                <option value="nanobanana">NanoBanana</option>
+                <option value="fal">Fal.ai (Flux)</option>
+              </select>
+            </div>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn--primary" onclick="generateCaseImage()">Generate image</button>
+          </div>
+          <div id="cs-ai-result" style="margin-top:1.5rem;display:none">
+            <label class="form-label">Generated image</label>
+            <div style="border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-top:0.5rem">
+              <img id="cs-ai-result-img" style="width:100%;display:block" alt="Generated image">
+            </div>
+            <div class="btn-group" style="margin-top:0.75rem">
+              <button class="btn" onclick="useGeneratedImage()">Add to case study images</button>
+              <button class="btn" onclick="downloadGeneratedImage()">Download</button>
+              <button class="btn" onclick="insertImageInMarkdown()">Insert in markdown</button>
+            </div>
+          </div>
+          <div id="cs-ai-loading" style="display:none;margin-top:1rem">
+            <div class="loader"><span class="loader__dot"></span><span class="loader__dot"></span><span class="loader__dot"></span>Generating image...</div>
+          </div>
+        </div>
       </div>
     </div>
-
-    <!-- IMAGES -->
     <div class="page" id="page-images">
       <div class="page-header">
         <h2>Images</h2>
@@ -1198,6 +1250,114 @@
             <button class="btn btn--primary" onclick="importToNewCaseFromUrl()">Create new case study with this</button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- EXPORT -->
+    <!-- SITE CONFIG -->
+    <div class="page" id="page-site-config">
+      <div class="page-header">
+        <h2>Site Configuration</h2>
+        <p>Logo, favicon, Google Analytics, resume link, and global settings</p>
+      </div>
+
+      <h3 style="font-size:1rem;margin-bottom:1rem">Logo &amp; Favicon</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Site logo (SVG or PNG)</label>
+          <input type="file" id="logo-upload" accept=".svg,.png" class="form-input" onchange="handleLogoUpload(this, 'logo')" style="padding:0.5rem">
+          <div class="form-help">Appears in the navigation bar. Recommended: SVG, max 200x40px.</div>
+          <div id="logo-preview" style="margin-top:0.75rem;padding:0.75rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);display:none">
+            <img id="logo-preview-img" style="max-height:40px;width:auto" alt="Logo preview">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Favicon (PNG, 32x32 or 64x64)</label>
+          <input type="file" id="favicon-upload" accept=".png,.ico,.svg" class="form-input" onchange="handleLogoUpload(this, 'favicon')" style="padding:0.5rem">
+          <div class="form-help">Browser tab icon. 32x32 PNG recommended.</div>
+          <div id="favicon-preview" style="margin-top:0.75rem;padding:0.75rem;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);display:none">
+            <img id="favicon-preview-img" style="max-height:32px;width:auto" alt="Favicon preview">
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Logo file path (after upload)</label>
+        <input class="form-input" id="cfg-logo-path" placeholder="icons/logo.svg">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Favicon file path</label>
+        <input class="form-input" id="cfg-favicon-path" value="icons/favicon.png">
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--border);margin:2rem 0">
+
+      <h3 style="font-size:1rem;margin-bottom:1rem">Google Analytics</h3>
+      <div class="form-group">
+        <label class="form-label">Google Analytics Measurement ID</label>
+        <input class="form-input" id="cfg-ga-id" placeholder="G-XXXXXXXXXX">
+        <div class="form-help">Get this from <a href="https://analytics.google.com" target="_blank" rel="noopener" style="color:var(--accent)">analytics.google.com</a> &rarr; Admin &rarr; Data Streams &rarr; your stream &rarr; Measurement ID. The tracking script loads automatically when this is set.</div>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--border);margin:2rem 0">
+
+      <h3 style="font-size:1rem;margin-bottom:1rem">Resume</h3>
+      <div class="form-group">
+        <label class="form-label">Resume URL (Google Doc or PDF link)</label>
+        <input class="form-input" id="cfg-resume-url" placeholder="https://docs.google.com/document/d/.../edit">
+        <div class="form-help">One-click access for visitors. Appears as a button in the hero section. Accepts Google Docs, Drive, or any public URL.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Resume button label</label>
+        <input class="form-input" id="cfg-resume-label" value="View resume" placeholder="View resume">
+      </div>
+
+      <div class="btn-group" style="margin-top:1.5rem">
+        <button class="btn btn--primary" onclick="saveSiteConfig()">Save configuration</button>
+        <button class="btn" onclick="exportSiteConfig()">Download site-config.json</button>
+        <button class="btn" onclick="deploySiteConfig()">Save &amp; Deploy</button>
+      </div>
+    </div>
+
+    <!-- DEPLOY -->
+    <div class="page" id="page-deploy">
+      <div class="page-header">
+        <h2>One-Click Deploy</h2>
+        <p>Push changes directly to GitHub. Vercel auto-deploys from there.</p>
+      </div>
+
+      <div style="background:var(--bg-el);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:2rem">
+        <h4 style="font-size:0.9rem;margin-bottom:0.5rem">How it works</h4>
+        <p style="font-size:0.8rem;color:var(--text-2);line-height:1.6">
+          When you click Deploy, your edited files are committed directly to your GitHub repo via API.
+          Vercel detects the push and auto-deploys within seconds. No manual download/upload needed.
+        </p>
+      </div>
+
+      <h3 style="font-size:1rem;margin-bottom:1rem">Select files to deploy</h3>
+      <div id="deploy-file-list" style="margin-bottom:1.5rem"></div>
+
+      <div class="form-group">
+        <label class="form-label">Commit message</label>
+        <input class="form-input" id="deploy-message" value="Update content from CMS">
+      </div>
+
+      <div class="btn-group" style="margin-top:1rem">
+        <button class="btn btn--primary" id="deploy-btn" onclick="executeOnClickDeploy()">
+          Deploy to GitHub &amp; Vercel
+        </button>
+      </div>
+
+      <div id="deploy-status" style="margin-top:1.5rem;display:none">
+        <div class="card" id="deploy-status-card">
+          <div class="card__title" id="deploy-status-title">Deploying...</div>
+          <div class="card__desc" id="deploy-status-desc"></div>
+        </div>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--border);margin:2rem 0">
+      <h3 style="font-size:1rem;margin-bottom:1rem">Deployment History</h3>
+      <div id="deploy-history">
+        <p style="font-size:0.85rem;color:var(--text-3)">View deployments at <a href="https://vercel.com/blissecode-projects/3xd/deployments" target="_blank" rel="noopener" style="color:var(--accent)">Vercel Dashboard</a></p>
       </div>
     </div>
 
@@ -2079,6 +2239,270 @@ exportSiteContent = function() {
   downloadFile('site-content.json', JSON.stringify(content, null, 2));
   toast('site-content.json downloaded (includes icon assignments)');
 };
+
+// ===== SITE CONFIG =====
+let siteConfig = { gaId: '', resumeUrl: '', logoPath: '', faviconPath: 'icons/favicon.png' };
+let logoFiles = { logo: null, favicon: null };
+
+async function loadSiteConfig() {
+  try {
+    const res = await fetch('site-config.json');
+    if (res.ok) siteConfig = await res.json();
+  } catch (e) {}
+  document.getElementById('cfg-ga-id').value = siteConfig.gaId || '';
+  document.getElementById('cfg-resume-url').value = siteConfig.resumeUrl || '';
+  document.getElementById('cfg-logo-path').value = siteConfig.logoPath || '';
+  document.getElementById('cfg-favicon-path').value = siteConfig.faviconPath || 'icons/favicon.png';
+}
+
+function handleLogoUpload(input, type) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    logoFiles[type] = { name: file.name, dataUrl: e.target.result, path: 'icons/' + file.name };
+    const preview = document.getElementById(type + '-preview');
+    const img = document.getElementById(type + '-preview-img');
+    img.src = e.target.result;
+    preview.style.display = 'block';
+    if (type === 'logo') document.getElementById('cfg-logo-path').value = 'icons/' + file.name;
+    if (type === 'favicon') document.getElementById('cfg-favicon-path').value = 'icons/' + file.name;
+    toast(type + ' uploaded: ' + file.name);
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
+function saveSiteConfig() {
+  siteConfig.gaId = document.getElementById('cfg-ga-id').value.trim();
+  siteConfig.resumeUrl = document.getElementById('cfg-resume-url').value.trim();
+  siteConfig.logoPath = document.getElementById('cfg-logo-path').value.trim();
+  siteConfig.faviconPath = document.getElementById('cfg-favicon-path').value.trim();
+  toast('Site config saved. Deploy to apply.');
+}
+
+function exportSiteConfig() {
+  saveSiteConfig();
+  downloadFile('site-config.json', JSON.stringify(siteConfig, null, 2));
+  toast('site-config.json downloaded');
+}
+
+function deploySiteConfig() {
+  saveSiteConfig();
+  deployFiles([
+    { path: 'site-config.json', content: JSON.stringify(siteConfig, null, 2) }
+  ], 'Update site config (GA, resume, logo)');
+}
+
+// Init config load
+const origLoadManifest2 = loadManifest;
+loadManifest = async function() {
+  await origLoadManifest2();
+  await loadSiteConfig();
+  renderDeployFileList();
+};
+
+// ===== ONE-CLICK DEPLOY =====
+const DEPLOY_ENDPOINT = '/api/deploy';
+
+function renderDeployFileList() {
+  const el = document.getElementById('deploy-file-list');
+  const files = getDeployableFiles();
+  el.innerHTML = files.map((f, i) => `
+    <label class="card" style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.4rem;cursor:pointer;padding:0.75rem 1rem">
+      <input type="checkbox" checked data-deploy-idx="${i}" style="accent-color:var(--accent);width:16px;height:16px">
+      <div>
+        <div style="font-size:0.85rem;font-weight:500">${f.path}</div>
+        <div style="font-size:0.7rem;color:var(--text-3)">${f.desc}</div>
+      </div>
+    </label>
+  `).join('');
+}
+
+function getDeployableFiles() {
+  const files = [];
+  // Always include manifest
+  files.push({ path: 'case-studies/manifest.json', desc: 'Case study index', content: () => JSON.stringify(manifest, null, 2) });
+  // Case study markdown files
+  Object.entries(caseContents).forEach(([id, md]) => {
+    files.push({ path: 'case-studies/' + id + '.md', desc: 'Case study content', content: () => md });
+  });
+  // Knowledge base
+  if (knowledgeData) {
+    files.push({ path: 'public-knowledge.json', desc: 'AI assistant knowledge base', content: () => JSON.stringify(knowledgeData, null, 2) });
+  }
+  // Availability
+  if (availData) {
+    files.push({ path: 'availability.json', desc: 'Availability status', content: () => JSON.stringify(availData, null, 2) });
+  }
+  // Site config
+  files.push({ path: 'site-config.json', desc: 'GA, resume, logo settings', content: () => JSON.stringify(siteConfig, null, 2) });
+  // Site content
+  files.push({ path: 'site-content.json', desc: 'Hero, about, experience content', content: () => {
+    return JSON.stringify({
+      hero: {
+        eyebrow: document.getElementById('hero-eyebrow').value,
+        firstName: document.getElementById('hero-firstname').value,
+        lastName: document.getElementById('hero-lastname').value,
+        tagline: document.getElementById('hero-tagline').value,
+        location: document.getElementById('hero-location').value,
+        experience: document.getElementById('hero-experience').value,
+        focus: document.getElementById('hero-focus').value,
+        cta1: document.getElementById('hero-cta1').value,
+        cta2: document.getElementById('hero-cta2').value
+      },
+      about: { heading: document.getElementById('about-heading').value, body: document.getElementById('about-body').value },
+      experience: experienceEntries,
+      icons: iconAssignments
+    }, null, 2);
+  }});
+  return files;
+}
+
+async function executeOnClickDeploy() {
+  const allFiles = getDeployableFiles();
+  const checkboxes = document.querySelectorAll('[data-deploy-idx]');
+  const selectedFiles = [];
+  checkboxes.forEach(cb => {
+    if (cb.checked) {
+      const idx = parseInt(cb.dataset.deployIdx);
+      const f = allFiles[idx];
+      selectedFiles.push({ path: f.path, content: f.content() });
+    }
+  });
+
+  if (selectedFiles.length === 0) { toast('Select at least one file', 'error'); return; }
+
+  const message = document.getElementById('deploy-message').value.trim() || 'Update from CMS';
+  const statusEl = document.getElementById('deploy-status');
+  const titleEl = document.getElementById('deploy-status-title');
+  const descEl = document.getElementById('deploy-status-desc');
+  const btn = document.getElementById('deploy-btn');
+
+  statusEl.style.display = 'block';
+  titleEl.textContent = 'Deploying...';
+  titleEl.style.color = 'var(--accent)';
+  descEl.textContent = 'Committing ' + selectedFiles.length + ' file(s) to GitHub...';
+  btn.disabled = true;
+
+  try {
+    const adminKey = prompt('Enter admin passphrase to deploy:');
+    if (!adminKey) { btn.disabled = false; statusEl.style.display = 'none'; return; }
+
+    const res = await fetch(DEPLOY_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Admin-Key': adminKey
+      },
+      body: JSON.stringify({ files: selectedFiles, message })
+    });
+
+    const data = await res.json();
+    if (res.ok && data.success) {
+      titleEl.textContent = 'Deployed successfully';
+      titleEl.style.color = 'var(--success, #4a9)';
+      descEl.textContent = data.filesUpdated + ' file(s) committed. SHA: ' + (data.commitSha || '').slice(0, 7) + '. Vercel will auto-deploy in seconds.';
+      toast('Deployed to GitHub. Vercel building...');
+    } else {
+      throw new Error(data.error || data.detail || 'Unknown error');
+    }
+  } catch (e) {
+    titleEl.textContent = 'Deploy failed';
+    titleEl.style.color = 'var(--danger)';
+    descEl.textContent = e.message;
+    toast('Deploy failed: ' + e.message, 'error');
+  }
+  btn.disabled = false;
+}
+
+async function deployFiles(files, message) {
+  const adminKey = prompt('Enter admin passphrase to deploy:');
+  if (!adminKey) return;
+  try {
+    const res = await fetch(DEPLOY_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey },
+      body: JSON.stringify({ files, message })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      toast('Deployed: ' + data.filesUpdated + ' file(s). Vercel building...');
+    } else {
+      throw new Error(data.error || 'Failed');
+    }
+  } catch (e) {
+    toast('Deploy failed: ' + e.message, 'error');
+  }
+}
+
+// ===== AI IMAGE GENERATION =====
+let lastGeneratedImage = null;
+
+async function generateCaseImage() {
+  const prompt = document.getElementById('cs-ai-prompt').value.trim();
+  if (!prompt) { toast('Enter a prompt', 'error'); return; }
+
+  const width = parseInt(document.getElementById('cs-ai-width').value) || 1024;
+  const height = parseInt(document.getElementById('cs-ai-height').value) || 768;
+  const provider = document.getElementById('cs-ai-provider').value;
+
+  document.getElementById('cs-ai-loading').style.display = 'block';
+  document.getElementById('cs-ai-result').style.display = 'none';
+
+  const adminKey = sessionStorage.getItem('cb_admin_key') || prompt('Admin passphrase:');
+  if (!adminKey) { document.getElementById('cs-ai-loading').style.display = 'none'; return; }
+  sessionStorage.setItem('cb_admin_key', adminKey);
+
+  try {
+    const res = await fetch('/api/generate-image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey },
+      body: JSON.stringify({ prompt, width, height, provider })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || data.detail || 'Generation failed');
+
+    const images = data.images || [];
+    if (images.length === 0) throw new Error('No images returned');
+
+    const imgUrl = images[0].url || images[0].image_url || images[0];
+    document.getElementById('cs-ai-result-img').src = imgUrl;
+    document.getElementById('cs-ai-result').style.display = 'block';
+    lastGeneratedImage = { url: imgUrl, prompt };
+    toast('Image generated');
+  } catch (e) {
+    toast('Generation failed: ' + e.message, 'error');
+  }
+  document.getElementById('cs-ai-loading').style.display = 'none';
+}
+
+function useGeneratedImage() {
+  if (!lastGeneratedImage) return;
+  const slug = currentEditId || 'untitled';
+  const filename = 'images/case-studies/' + slug + '-ai-' + Date.now() + '.jpg';
+  const images = document.getElementById('cs-images');
+  images.value = (images.value ? images.value + '\n' : '') + lastGeneratedImage.url;
+  toast('Image URL added to case study images. For permanent hosting, download and upload to images/ folder.');
+}
+
+function downloadGeneratedImage() {
+  if (!lastGeneratedImage) return;
+  const a = document.createElement('a');
+  a.href = lastGeneratedImage.url;
+  a.download = 'generated-' + Date.now() + '.jpg';
+  a.target = '_blank';
+  a.click();
+}
+
+function insertImageInMarkdown() {
+  if (!lastGeneratedImage) return;
+  const md = document.getElementById('cs-markdown');
+  const imgMd = '\n\n![' + (lastGeneratedImage.prompt || 'Generated image').slice(0, 60) + '](' + lastGeneratedImage.url + ')\n';
+  md.value += imgMd;
+  updateCasePreview();
+  toast('Image inserted in markdown');
+}
 </script>
 </body>
 </html>

@@ -9,6 +9,27 @@
   <meta name="author" content="Chiranjeet Banerjee">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://chiranjeetbanerjee.com/">
+  <link rel="icon" type="image/png" href="icons/favicon.png" id="favicon-link">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+  <!-- Google Analytics (loaded dynamically from site-config.json) -->
+  <script>
+    (function(){
+      fetch('site-config.json').then(r=>r.ok?r.json():null).then(cfg=>{
+        if(!cfg)return;
+        if(cfg.gaId){
+          var s=document.createElement('script');
+          s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+cfg.gaId;
+          document.head.appendChild(s);
+          window.dataLayer=window.dataLayer||[];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js',new Date());gtag('config',cfg.gaId);
+          window.gtag=gtag;
+        }
+        if(cfg.faviconPath){document.getElementById('favicon-link').href=cfg.faviconPath;}
+      }).catch(function(){});
+    })();
+  </script>
 
   <meta property="og:type" content="website">
   <meta property="og:title" content="Chiranjeet Banerjee | Experience Design Lead &amp; AI Strategist">
@@ -316,6 +337,7 @@
       <div class="hero__actions reveal">
         <a href="#work" class="btn btn--primary">View case studies</a>
         <a href="#contact" class="btn">Start a conversation</a>
+        <a href="#" class="btn" id="resume-link" style="display:none" target="_blank" rel="noopener">View resume</a>
       </div>
       <div class="hero__scroll-hint" aria-hidden="true">
         <svg width="16" height="24" viewBox="0 0 16 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="14" height="22" rx="7"/><line x1="8" y1="6" x2="8" y2="10"/></svg>
@@ -708,6 +730,24 @@
       } catch (e) { /* No site-content.json, use defaults */ }
     }
     loadSiteContent();
+
+    // Site Config Loader: reads site-config.json for resume, logo, GA, etc.
+    async function loadSiteConfig() {
+      try {
+        const res = await fetch('site-config.json');
+        if (!res.ok) return;
+        const cfg = await res.json();
+        if (cfg.resumeUrl) {
+          var rl = document.getElementById('resume-link');
+          if (rl) { rl.href = cfg.resumeUrl; rl.style.display = ''; }
+        }
+        if (cfg.logoPath) {
+          var logo = document.querySelector('.nav__logo');
+          if (logo) { logo.innerHTML = '<img src="' + cfg.logoPath + '" alt="CB" style="height:28px;width:auto">'; }
+        }
+      } catch (e) { /* no config */ }
+    }
+    loadSiteConfig();
 
     // Anime.js hero stagger
     window.addEventListener('load', () => {

@@ -4,6 +4,11 @@
   "framework": null,
   "cleanUrls": true,
   "trailingSlash": false,
+  "functions": {
+    "api/chat.js": { "maxDuration": 30 },
+    "api/deploy.js": { "maxDuration": 30 },
+    "api/generate-image.js": { "maxDuration": 60 }
+  },
   "headers": [
     {
       "source": "/admin.html",
