@@ -1,0 +1,115 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2026-03-11T00:00:00Z",
+  "identity": {
+    "name": "Chiranjeet Banerjee",
+    "title": "Experience Design Lead / Manager",
+    "location": "Kuala Lumpur, Malaysia",
+    "experienceYears": "13+",
+    "summary": "Experience Design Lead with 13+ years across UX, information architecture, research, and product design. Also creates editorial-style photography and AI-assisted visual art (synthography) under the name Broekn Camera."
+  },
+  "brands": {
+    "blisseCode": {
+      "name": "Blisse Code",
+      "focus": "UX strategy, AI integration consulting, design audits, and productized research services",
+      "services": [
+        "UX Audit",
+        "Research Sprint",
+        "AI Workflow Design",
+        "Conversion Review",
+        "IA Restructure",
+        "Workshop Facilitation"
+      ]
+    },
+    "broeknCamera": {
+      "name": "Broekn Camera",
+      "focus": "Premium cinematic portraiture and AI-assisted visual art with a neo-noir, emotionally raw aesthetic",
+      "services": [
+        "Editorial Portraiture",
+        "Brand Shoots",
+        "AI Visual Art / Synthography",
+        "Cinematic Direction",
+        "Fine Art Print"
+      ]
+    }
+  },
+  "expertise": [
+    "User Experience Design",
+    "Information Architecture",
+    "Product Design",
+    "Design Systems",
+    "UX Research",
+    "Conversion Optimization",
+    "AI-Assisted Design Workflows",
+    "Design Strategy",
+    "Cinematic Photography",
+    "AI Art / Synthography"
+  ],
+  "industries": [
+    "Fintech",
+    "EdTech",
+    "Travel and Hospitality",
+    "Enterprise Software",
+    "Aviation"
+  ],
+  "approach": [
+    "Evidence-first, then action: weighs options, notes risks, and decides deliberately",
+    "Mental models and IA before UI: models user thinking, structures content flows, then designs screens",
+    "Clear prioritization frameworks: RICE, Kano, MoSCoW, Opportunity Scoring",
+    "Revenue-aware design thinking: every design decision ties back to a measurable business question",
+    "Skeptical, evidence-led thinking: does not chase trends, focuses on what converts and retains"
+  ],
+  "offerLadder": {
+    "free": "High-value content, posts, and threads",
+    "entry": "Productized UX audit or mini strategy consult",
+    "mid": "Workshops, consulting sprints, brand content packages",
+    "high": "Premium commissioned shoots, retainers, enterprise consulting"
+  },
+  "values": [
+    "Accuracy and skeptical thinking over motivational fluff",
+    "Practical execution over theoretical frameworks",
+    "Evidence-based decisions over gut feelings",
+    "Premium and selective over mass volume",
+    "Clarity over decoration"
+  ],
+  "antiClaims": [
+    "Does not overclaim results without evidence",
+    "Does not use fake testimonials or inflated credentials",
+    "Does not promise specific conversion lifts without data",
+    "Does not take on projects misaligned with quality standards",
+    "Does not do mass content farming or low-value work"
+  ],
+  "platforms": {
+    "instagram": "Primary visual authority engine (Broekn Camera)",
+    "threads": "Personality, thought-leadership, community",
+    "linkedin": "Credibility, case studies, consulting pipeline"
+  },
+  "contact": {
+    "booking": "https://calendly.com/meetchiranjeet/30min",
+    "email": "hello@chiranjeetbanerjee.com",
+    "linkedin": "https://linkedin.com/in/chiranjeetbanerjee"
+  },
+  "faq": [
+    {
+      "q": "What kind of projects does Chiranjeet take on?",
+      "a": "Select consulting, audit, and creative projects. Focused on UX strategy, AI workflow integration, and premium visual work. Not available for low-budget or mass-market content work."
+    },
+    {
+      "q": "Is Chiranjeet available for freelance work?",
+      "a": "Chiranjeet takes on select projects alongside full-time work. Best to book a 30-minute call to discuss scope and fit."
+    },
+    {
+      "q": "What makes Chiranjeet different from other designers?",
+      "a": "The rare combination of UX leadership, AI workflow expertise, and cinematic visual storytelling. Evidence-led, revenue-aware thinking rather than trend-chasing."
+    },
+    {
+      "q": "Does Chiranjeet work with international clients?",
+      "a": "Yes. Based in Kuala Lumpur but available for remote work across Southeast Asia and internationally."
+    },
+    {
+      "q": "What tools and methods does Chiranjeet use?",
+      "a": "Figma for design, various research and synthesis methods including affinity mapping, card sorting, and usability testing. Uses RICE, Kano, and MoSCoW for prioritization. Design systems thinking with tokens and components."
+    }
+  ],
+  "customFacts": []
+}
