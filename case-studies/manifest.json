@@ -1,0 +1,95 @@
+{
+  "generated": "2026-03-11T00:00:00Z",
+  "studies": [
+    {
+      "id": "quiz-application-students",
+      "title": "Quiz Application for Students",
+      "year": "2021",
+      "type": "Product Design",
+      "domain": "EdTech",
+      "summary": "Optimized self-paced learning for students from low-income families. Focused on reducing cognitive load and improving completion rates in resource-constrained environments.",
+      "tags": ["UX Design", "EdTech", "Research"],
+      "thumbnail": null,
+      "file": "case-studies/quiz-application-students.md",
+      "images": [],
+      "links": {
+        "figma": null,
+        "figmaEmbed": null,
+        "framer": null,
+        "extra": null
+      }
+    },
+    {
+      "id": "user-management-application",
+      "title": "User Management Application",
+      "year": "2020",
+      "type": "Product Design",
+      "domain": "Enterprise / EdTech",
+      "summary": "Reduced administrative effort and time for teachers while scaling the application globally. Restructured information architecture to support multi-region operations.",
+      "tags": ["UX Design", "Enterprise", "IA"],
+      "thumbnail": null,
+      "file": "case-studies/user-management-application.md",
+      "images": [],
+      "links": {
+        "figma": null,
+        "figmaEmbed": null,
+        "framer": null,
+        "extra": null
+      }
+    },
+    {
+      "id": "hotel-booking-experience",
+      "title": "Hotel Booking Experience",
+      "year": "2020",
+      "type": "Product Design",
+      "domain": "Travel",
+      "summary": "Improved preference integration during the traveller decision process. Designed filtering and recommendation patterns that reduced search-to-book friction.",
+      "tags": ["UX Design", "Travel", "Conversion"],
+      "thumbnail": null,
+      "file": "case-studies/hotel-booking-experience.md",
+      "images": [],
+      "links": {
+        "figma": null,
+        "figmaEmbed": null,
+        "framer": null,
+        "extra": null
+      }
+    },
+    {
+      "id": "event-management-application",
+      "title": "Event Management Application",
+      "year": "2018",
+      "type": "Product Design",
+      "domain": "EdTech",
+      "summary": "Improved visibility for business on teacher empowerment programs while making events discoverable for all teachers.",
+      "tags": ["UX Design", "EdTech", "Discovery"],
+      "thumbnail": null,
+      "file": "case-studies/event-management-application.md",
+      "images": [],
+      "links": {
+        "figma": null,
+        "figmaEmbed": null,
+        "framer": null,
+        "extra": null
+      }
+    },
+    {
+      "id": "fintech-customer-portal",
+      "title": "Fintech Customer Portal",
+      "year": "2013",
+      "type": "Product Design",
+      "domain": "Fintech",
+      "summary": "Responsive web design for a financial services customer portal. Early responsive implementation solving complex data display challenges on mobile.",
+      "tags": ["UX Design", "Fintech", "Responsive"],
+      "thumbnail": null,
+      "file": "case-studies/fintech-customer-portal.md",
+      "images": [],
+      "links": {
+        "figma": null,
+        "figmaEmbed": null,
+        "framer": null,
+        "extra": null
+      }
+    }
+  ]
+}

@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Admin | Chiranjeet Banerjee Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js"></script>
+  <style>
+    :root {
+      --bg: #0e0e0e;
+      --bg-el: #161616;
+      --bg-card: #1c1c1c;
+      --bg-input: #111;
+      --border: #2a2a2a;
+      --border-focus: #C9A84C;
+      --text: #e0dbd2;
+      --text-2: #8a8578;
+      --text-3: #5a5650;
+      --accent: #C9A84C;
+      --accent-h: #DFC06A;
+      --danger: #cc4444;
+      --success: #4a9;
+      --font: 'DM Sans', system-ui, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --radius: 8px;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { font-size: 15px; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+    ::selection { background: var(--accent); color: #0e0e0e; }
+
+    /* ---- AUTH GATE ---- */
+    .auth-gate {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    .auth-box {
+      background: var(--bg-el);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 3rem;
+      max-width: 380px;
+      width: 100%;
+      text-align: center;
+    }
+    .auth-box h1 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .auth-box p {
+      font-size: 0.85rem;
+      color: var(--text-2);
+      margin-bottom: 1.5rem;
+    }
+    .auth-box input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.9rem;
+      text-align: center;
+      letter-spacing: 0.15em;
+      margin-bottom: 1rem;
+    }
+    .auth-box input:focus {
+      outline: none;
+      border-color: var(--border-focus);
+    }
+    .auth-error {
+      color: var(--danger);
+      font-size: 0.8rem;
+      margin-bottom: 0.75rem;
+      display: none;
+    }
+
+    /* ---- LAYOUT ---- */
+    .admin { display: none; }
+    .admin.active { display: flex; min-height: 100vh; }
+
+    .sidebar {
+      width: 240px;
+      background: var(--bg-el);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem 0;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .sidebar__logo {
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0 1.5rem;
+      margin-bottom: 0.25rem;
+      color: var(--text);
+    }
+    .sidebar__sub {
+      font-size: 0.7rem;
+      color: var(--text-3);
+      padding: 0 1.5rem;
+      margin-bottom: 2rem;
+      font-family: var(--mono);
+      letter-spacing: 0.05em;
+    }
+    .sidebar__nav { list-style: none; }
+    .sidebar__section {
+      font-size: 0.65rem;
+      font-family: var(--mono);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      padding: 1.5rem 1.5rem 0.5rem;
+    }
+    .sidebar__item {
+      padding: 0.6rem 1.5rem;
+      font-size: 0.85rem;
+      color: var(--text-2);
+      cursor: pointer;
+      transition: all 120ms;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      border-left: 3px solid transparent;
+    }
+    .sidebar__item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+    .sidebar__item.active {
+      color: var(--accent);
+      background: rgba(201,168,76,0.06);
+      border-left-color: var(--accent);
+    }
+    .sidebar__item svg { width: 16px; height: 16px; opacity: 0.6; }
+
+    .main-content {
+      flex: 1;
+      padding: 2rem 2.5rem;
+      max-width: 960px;
+      overflow-y: auto;
+    }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .page-header {
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .page-header h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    .page-header p {
+      font-size: 0.85rem;
+      color: var(--text-2);
+    }
+
+    /* ---- FORMS ---- */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-2);
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-family: var(--mono);
+    }
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      padding: 0.65rem 0.85rem;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 0.9rem;
+      transition: border-color 120ms;
+    }
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--border-focus);
+    }
+    .form-textarea {
+      min-height: 120px;
+      resize: vertical;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      line-height: 1.6;
+    }
+    .form-textarea.tall { min-height: 300px; }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    .form-row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+    }
+    .form-help {
+      font-size: 0.72rem;
+      color: var(--text-3);
+      margin-top: 0.3rem;
+    }
+    .form-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.5rem;
+    }
+    .form-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.25rem 0.6rem;
+      background: var(--bg-el);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 0.75rem;
+      color: var(--text-2);
+      font-family: var(--mono);
+    }
+    .form-tag button {
+      background: none;
+      border: none;
+      color: var(--danger);
+      cursor: pointer;
+      font-size: 0.9rem;
+      line-height: 1;
+      padding: 0;
+    }
+
+    /* ---- BUTTONS ---- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 1.1rem;
+      font-family: var(--font);
+      font-size: 0.82rem;
+      font-weight: 500;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--bg-el);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 120ms;
+    }
+    .btn:hover { background: var(--bg-card); border-color: var(--text-3); }
+    .btn--primary { background: var(--accent); color: #0e0e0e; border-color: var(--accent); }
+    .btn--primary:hover { background: var(--accent-h); border-color: var(--accent-h); }
+    .btn--danger { border-color: var(--danger); color: var(--danger); }
+    .btn--danger:hover { background: rgba(204,68,68,0.1); }
+    .btn--sm { padding: 0.35rem 0.75rem; font-size: 0.75rem; }
+    .btn-group { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+    /* ---- CARDS / LISTS ---- */
+    .card {
+      background: var(--bg-el);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-bottom: 0.75rem;
+      transition: border-color 120ms;
+    }
+    .card:hover { border-color: var(--text-3); }
+    .card__header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .card__title {
+      font-size: 1rem;
+      font-weight: 500;
+    }
+    .card__meta {
+      font-size: 0.75rem;
+      color: var(--text-3);
+      font-family: var(--mono);
+    }
+    .card__desc {
+      font-size: 0.85rem;
+      color: var(--text-2);
+      margin-bottom: 0.75rem;
+    }
+
+    /* ---- PREVIEW PANE ---- */
+    .preview-pane {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-top: 1rem;
+      max-height: 400px;
+      overflow-y: auto;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    .preview-pane h1, .preview-pane h2, .preview-pane h3 {
+      margin-top: 1.25rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    .preview-pane h1 { font-size: 1.4rem; }
+    .preview-pane h2 { font-size: 1.2rem; }
+    .preview-pane p { margin-bottom: 0.6rem; }
+    .preview-pane ul, .preview-pane ol { padding-left: 1.5rem; margin-bottom: 0.6rem; }
+    .preview-pane code {
+      font-family: var(--mono);
+      background: var(--bg-el);
+      padding: 0.15rem 0.4rem;
+      border-radius: 3px;
+      font-size: 0.82rem;
+    }
+    .preview-pane blockquote {
+      border-left: 3px solid var(--accent);
+      padding-left: 1rem;
+      margin: 0.75rem 0;
+      color: var(--text-2);
+      font-style: italic;
+    }
+
+    /* ---- INTEGRATION CARDS ---- */
+    .integration-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1.25rem;
+      background: var(--bg-el);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 0.75rem;
+    }
+    .integration-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--bg-card);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    .integration-info { flex: 1; }
+    .integration-info h4 { font-size: 0.95rem; font-weight: 500; margin-bottom: 0.15rem; }
+    .integration-info p { font-size: 0.8rem; color: var(--text-2); margin-bottom: 0.75rem; }
+
+    /* ---- IMAGE GRID ---- */
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    .image-thumb {
+      aspect-ratio: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+      transition: border-color 120ms;
+    }
+    .image-thumb:hover { border-color: var(--accent); }
+    .image-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .image-thumb__name {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 0.4rem 0.5rem;
+      background: rgba(0,0,0,0.75);
+      font-size: 0.65rem;
+      font-family: var(--mono);
+      color: var(--text-2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ---- TOAST ---- */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      padding: 0.75rem 1.25rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.85rem;
+      color: var(--text);
+      z-index: 999;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 300ms cubic-bezier(0.22,1,0.36,1);
+    }
+    .toast.visible { transform: translateY(0); opacity: 1; }
+    .toast.success { border-color: var(--success); }
+    .toast.error { border-color: var(--danger); }
+
+    /* ---- TABS ---- */
+    .tab-bar {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+    .tab-btn {
+      padding: 0.6rem 1rem;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text-3);
+      font-family: var(--font);
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 120ms;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ---- EMPTY STATE ---- */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-3);
+    }
+    .empty-state p { font-size: 0.85rem; margin-bottom: 1rem; }
+
+    /* ---- RESPONSIVE ---- */
+    @media (max-width: 768px) {
+      .admin.active { flex-direction: column; }
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        padding: 1rem 0;
+      }
+      .sidebar__nav { display: flex; flex-wrap: wrap; padding: 0 1rem; gap: 0.25rem; }
+      .sidebar__section { display: none; }
+      .sidebar__item { padding: 0.4rem 0.8rem; border-left: none; border-radius: 4px; font-size: 0.8rem; }
+      .sidebar__item.active { border-left: none; }
+      .main-content { padding: 1.5rem; }
+      .form-row, .form-row-3 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== AUTH GATE ===== -->
+<div class="auth-gate" id="authGate">
+  <div class="auth-box">
+    <h1>Portfolio Admin</h1>
+    <p>Chiranjeet Banerjee CMS</p>
+    <div class="auth-error" id="authError">Incorrect passphrase</div>
+    <input type="password" id="authInput" placeholder="Enter passphrase" autofocus>
+    <button class="btn btn--primary" style="width:100%" onclick="authenticate()">Unlock</button>
+  </div>
+</div>
+
+<!-- ===== ADMIN PANEL ===== -->
+<div class="admin" id="adminPanel">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar__logo">Portfolio CMS</div>
+    <div class="sidebar__sub">v1.0 / private</div>
+    <ul class="sidebar__nav">
+      <li class="sidebar__section">Content</li>
+      <li class="sidebar__item active" data-page="dashboard" onclick="switchPage('dashboard', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </li>
+      <li class="sidebar__item" data-page="site-content" onclick="switchPage('site-content', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+        Site Content
+      </li>
+      <li class="sidebar__item" data-page="case-studies" onclick="switchPage('case-studies', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        Case Studies
+      </li>
+      <li class="sidebar__item" data-page="images" onclick="switchPage('images', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+        Images
+      </li>
+      <li class="sidebar__section">Integrations</li>
+      <li class="sidebar__item" data-page="integrations" onclick="switchPage('integrations', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+        Connect
+      </li>
+      <li class="sidebar__item" data-page="gdocs-import" onclick="switchPage('gdocs-import', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Import Docs
+      </li>
+      <li class="sidebar__section">System</li>
+      <li class="sidebar__item" data-page="export" onclick="switchPage('export', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Export / Save
+      </li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <h2>Dashboard</h2>
+        <p>Overview of your portfolio content</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;margin-bottom:2rem">
+        <div class="card">
+          <div class="card__title" style="font-size:2rem;font-weight:600;color:var(--accent)" id="stat-studies">0</div>
+          <div class="card__meta">Case studies</div>
+        </div>
+        <div class="card">
+          <div class="card__title" style="font-size:2rem;font-weight:600;color:var(--accent)" id="stat-images">0</div>
+          <div class="card__meta">Images uploaded</div>
+        </div>
+        <div class="card">
+          <div class="card__title" style="font-size:2rem;font-weight:600;color:var(--accent)" id="stat-words">0</div>
+          <div class="card__meta">Total words</div>
+        </div>
+      </div>
+      <h3 style="font-size:1rem;margin-bottom:0.75rem">Quick Actions</h3>
+      <div class="btn-group">
+        <button class="btn" onclick="switchPage('case-studies',document.querySelector('[data-page=case-studies]'));showCaseEditor(null)">+ New case study</button>
+        <button class="btn" onclick="switchPage('images',document.querySelector('[data-page=images]'))">Upload images</button>
+        <button class="btn" onclick="switchPage('gdocs-import',document.querySelector('[data-page=gdocs-import]'))">Import from Google Docs</button>
+        <button class="btn" onclick="switchPage('export',document.querySelector('[data-page=export]'))">Export all files</button>
+      </div>
+    </div>
+
+    <!-- SITE CONTENT -->
+    <div class="page" id="page-site-content">
+      <div class="page-header">
+        <h2>Site Content</h2>
+        <p>Edit hero, about, and experience sections</p>
+      </div>
+
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab(this,'tab-hero')">Hero</button>
+        <button class="tab-btn" onclick="switchTab(this,'tab-about')">About</button>
+        <button class="tab-btn" onclick="switchTab(this,'tab-experience')">Experience</button>
+      </div>
+
+      <div class="tab-panel active" id="tab-hero">
+        <div class="form-group">
+          <label class="form-label">Eyebrow text</label>
+          <input class="form-input" id="hero-eyebrow" value="Experience Design Lead, AI Strategist">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">First name</label>
+            <input class="form-input" id="hero-firstname" value="Chiranjeet">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last name (accent color)</label>
+            <input class="form-input" id="hero-lastname" value="Banerjee">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tagline</label>
+          <textarea class="form-textarea" id="hero-tagline" rows="3">I design digital products that earn trust and revenue. 13+ years turning complexity into clarity across UX, research, and product strategy.</textarea>
+        </div>
+        <div class="form-row-3">
+          <div class="form-group">
+            <label class="form-label">Location</label>
+            <input class="form-input" id="hero-location" value="Kuala Lumpur, MY">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Experience</label>
+            <input class="form-input" id="hero-experience" value="13+ Years">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Focus</label>
+            <input class="form-input" id="hero-focus" value="UX + AI + Visual">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Primary CTA text</label>
+            <input class="form-input" id="hero-cta1" value="View case studies">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Secondary CTA text</label>
+            <input class="form-input" id="hero-cta2" value="Start a conversation">
+          </div>
+        </div>
+        <div class="btn-group" style="margin-top:1rem">
+          <button class="btn btn--primary" onclick="saveSiteContent()">Save changes</button>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab-about">
+        <div class="form-group">
+          <label class="form-label">About heading</label>
+          <input class="form-input" id="about-heading" value="Designing for outcomes, not aesthetics alone.">
+        </div>
+        <div class="form-group">
+          <label class="form-label">About paragraphs (HTML allowed)</label>
+          <textarea class="form-textarea tall" id="about-body"><p><strong>I build products people actually use.</strong> My work sits at the intersection of user experience strategy, applied AI, and visual storytelling. I structure complexity so teams can ship with confidence and users can act without friction.</p>
+<p>Over 13 years, I have worked across enterprise platforms, consumer products, fintech, edtech, and hospitality. I do not chase trends. I focus on what converts, retains, and reduces support load. Every design decision ties back to a measurable business question.</p>
+<p>When I am not designing products, I create cinematic, editorially styled photography and AI-assisted visual art under the name <strong>Broekn Camera</strong>.</p></textarea>
+        </div>
+        <div class="btn-group" style="margin-top:1rem">
+          <button class="btn btn--primary" onclick="saveSiteContent()">Save changes</button>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab-experience">
+        <div id="exp-list"></div>
+        <button class="btn" onclick="addExpEntry()" style="margin-top:1rem">+ Add experience entry</button>
+        <div class="btn-group" style="margin-top:1rem">
+          <button class="btn btn--primary" onclick="saveSiteContent()">Save changes</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASE STUDIES -->
+    <div class="page" id="page-case-studies">
+      <div class="page-header">
+        <h2>Case Studies</h2>
+        <p>Manage and edit case study content</p>
+      </div>
+
+      <!-- List view -->
+      <div id="cs-list-view">
+        <div class="btn-group" style="margin-bottom:1.5rem">
+          <button class="btn btn--primary" onclick="showCaseEditor(null)">+ New case study</button>
+        </div>
+        <div id="cs-list"></div>
+      </div>
+
+      <!-- Editor view -->
+      <div id="cs-editor-view" style="display:none">
+        <div class="btn-group" style="margin-bottom:1.5rem">
+          <button class="btn" onclick="hideCaseEditor()">&larr; Back to list</button>
+          <button class="btn btn--primary" onclick="saveCaseStudy()">Save case study</button>
+          <button class="btn btn--danger" onclick="deleteCaseStudy()" id="cs-delete-btn" style="display:none">Delete</button>
+        </div>
+
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="switchTab(this,'cs-tab-meta')">Metadata</button>
+          <button class="tab-btn" onclick="switchTab(this,'cs-tab-content')">Content</button>
+          <button class="tab-btn" onclick="switchTab(this,'cs-tab-images')">Images</button>
+          <button class="tab-btn" onclick="switchTab(this,'cs-tab-links')">Figma / Framer</button>
+        </div>
+
+        <div class="tab-panel active" id="cs-tab-meta">
+          <div class="form-group">
+            <label class="form-label">Title</label>
+            <input class="form-input" id="cs-title">
+          </div>
+          <div class="form-row-3">
+            <div class="form-group">
+              <label class="form-label">Year</label>
+              <input class="form-input" id="cs-year" placeholder="2024">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Type</label>
+              <input class="form-input" id="cs-type" placeholder="Product Design">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Domain</label>
+              <input class="form-input" id="cs-domain" placeholder="Fintech">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Summary (1-2 sentences)</label>
+            <textarea class="form-textarea" id="cs-summary" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tags (comma separated)</label>
+            <input class="form-input" id="cs-tags" placeholder="UX Design, Research, Enterprise">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Thumbnail path</label>
+            <input class="form-input" id="cs-thumbnail" placeholder="images/case-studies/my-project-thumb.jpg">
+            <div class="form-help">Relative path to thumbnail image. Use the Images tab to upload first.</div>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="cs-tab-content">
+          <div class="form-group">
+            <label class="form-label">Case study content (Markdown)</label>
+            <textarea class="form-textarea tall" id="cs-markdown" oninput="updateCasePreview()" style="min-height:400px"></textarea>
+            <div class="form-help">Write in Markdown. Use # for headings, **bold**, *italic*, - for lists.</div>
+          </div>
+          <label class="form-label">Live preview</label>
+          <div class="preview-pane" id="cs-preview"></div>
+        </div>
+
+        <div class="tab-panel" id="cs-tab-images">
+          <p style="font-size:0.85rem;color:var(--text-2);margin-bottom:1rem">
+            Link images to this case study. Images are referenced by path in your markdown content using <code style="font-family:var(--mono);background:var(--bg-input);padding:0.1rem 0.3rem;border-radius:3px;font-size:0.8rem">![alt](images/case-studies/filename.jpg)</code>
+          </p>
+          <div class="form-group">
+            <label class="form-label">Associated images (one path per line)</label>
+            <textarea class="form-textarea" id="cs-images" placeholder="images/case-studies/project-hero.jpg&#10;images/case-studies/project-wireframe.png"></textarea>
+          </div>
+        </div>
+
+        <div class="tab-panel" id="cs-tab-links">
+          <div class="form-group">
+            <label class="form-label">Figma file URL</label>
+            <input class="form-input" id="cs-figma" placeholder="https://www.figma.com/file/...">
+            <div class="form-help">Link to the Figma file for this project. Used for your reference only (not shown on site).</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Figma embed URL (for iframe)</label>
+            <input class="form-input" id="cs-figma-embed" placeholder="https://www.figma.com/embed?embed_host=share&url=...">
+            <div class="form-help">If you want to embed a Figma frame on the case study page, paste the embed URL here.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Framer project URL</label>
+            <input class="form-input" id="cs-framer" placeholder="https://framer.com/projects/...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Additional links (JSON array)</label>
+            <textarea class="form-textarea" id="cs-extra-links" placeholder='[{"label":"Prototype","url":"https://..."},{"label":"Miro Board","url":"https://..."}]'></textarea>
+            <div class="form-help">Add any other project links as a JSON array. These will be stored in the manifest.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IMAGES -->
+    <div class="page" id="page-images">
+      <div class="page-header">
+        <h2>Images</h2>
+        <p>Upload and manage portfolio images</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Upload images</label>
+        <input type="file" id="image-upload" multiple accept="image/*" class="form-input" onchange="handleImageUpload(this)" style="padding:0.5rem">
+        <div class="form-help">Images will be prepared for download. Place them in the <code style="font-family:var(--mono);font-size:0.75rem">images/case-studies/</code> folder on your server.</div>
+      </div>
+      <h3 style="font-size:0.9rem;margin-bottom:0.5rem;margin-top:2rem">Uploaded images this session</h3>
+      <div class="image-grid" id="image-gallery"></div>
+      <div class="empty-state" id="image-empty">
+        <p>No images uploaded yet this session.</p>
+        <p style="font-size:0.75rem;color:var(--text-3)">Upload images above, then reference them in case study markdown.</p>
+      </div>
+    </div>
+
+    <!-- INTEGRATIONS -->
+    <div class="page" id="page-integrations">
+      <div class="page-header">
+        <h2>Integrations</h2>
+        <p>Connect external tools to your portfolio workflow</p>
+      </div>
+
+      <div class="integration-card">
+        <div class="integration-icon">F</div>
+        <div class="integration-info">
+          <h4>Figma</h4>
+          <p>Link Figma files to case studies. Each case study can store a Figma file URL and an embeddable frame URL for presentations.</p>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Default Figma team/project URL</label>
+            <input class="form-input" id="int-figma-default" placeholder="https://www.figma.com/files/team/...">
+            <div class="form-help">Set a default Figma project. Individual case studies can override this.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="integration-card">
+        <div class="integration-icon">Fr</div>
+        <div class="integration-info">
+          <h4>Framer</h4>
+          <p>Link Framer prototypes and published sites to case studies.</p>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Default Framer workspace URL</label>
+            <input class="form-input" id="int-framer-default" placeholder="https://framer.com/projects/...">
+          </div>
+        </div>
+      </div>
+
+      <div class="integration-card">
+        <div class="integration-icon">G</div>
+        <div class="integration-info">
+          <h4>Google Docs</h4>
+          <p>Import content from Google Docs into case studies. Go to the Import Docs tab to paste content or fetch from a published URL.</p>
+          <button class="btn btn--sm" onclick="switchPage('gdocs-import',document.querySelector('[data-page=gdocs-import]'))">Open importer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GOOGLE DOCS IMPORT -->
+    <div class="page" id="page-gdocs-import">
+      <div class="page-header">
+        <h2>Import from Google Docs</h2>
+        <p>Paste content or fetch from a published Google Doc</p>
+      </div>
+
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab(this,'gdocs-tab-paste')">Paste content</button>
+        <button class="tab-btn" onclick="switchTab(this,'gdocs-tab-url')">Fetch from URL</button>
+      </div>
+
+      <div class="tab-panel active" id="gdocs-tab-paste">
+        <p style="font-size:0.85rem;color:var(--text-2);margin-bottom:1rem">
+          Open your Google Doc, select all content (Ctrl+A), copy it, and paste below.
+          The importer will convert it to clean Markdown.
+        </p>
+        <div class="form-group">
+          <label class="form-label">Pasted content (plain text or HTML)</label>
+          <textarea class="form-textarea tall" id="gdocs-paste" placeholder="Paste your Google Docs content here..."></textarea>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn--primary" onclick="convertPastedContent()">Convert to Markdown</button>
+        </div>
+        <div class="form-group" style="margin-top:1.5rem" id="gdocs-result-group" hidden>
+          <label class="form-label">Converted Markdown</label>
+          <textarea class="form-textarea tall" id="gdocs-result"></textarea>
+          <div class="btn-group" style="margin-top:0.75rem">
+            <button class="btn" onclick="copyToClipboard(document.getElementById('gdocs-result').value)">Copy markdown</button>
+            <button class="btn btn--primary" onclick="importToNewCase()">Create new case study with this</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="gdocs-tab-url">
+        <p style="font-size:0.85rem;color:var(--text-2);margin-bottom:1rem">
+          Publish your Google Doc first: File &rarr; Share &rarr; Publish to web.
+          Then paste the published URL below.
+        </p>
+        <div class="form-group">
+          <label class="form-label">Published Google Doc URL</label>
+          <input class="form-input" id="gdocs-url" placeholder="https://docs.google.com/document/d/.../pub">
+        </div>
+        <div class="btn-group">
+          <button class="btn btn--primary" onclick="fetchGoogleDoc()">Fetch and convert</button>
+        </div>
+        <div class="form-group" style="margin-top:1.5rem" id="gdocs-url-result-group" hidden>
+          <label class="form-label">Converted Markdown</label>
+          <textarea class="form-textarea tall" id="gdocs-url-result"></textarea>
+          <div class="btn-group" style="margin-top:0.75rem">
+            <button class="btn" onclick="copyToClipboard(document.getElementById('gdocs-url-result').value)">Copy markdown</button>
+            <button class="btn btn--primary" onclick="importToNewCaseFromUrl()">Create new case study with this</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPORT -->
+    <div class="page" id="page-export">
+      <div class="page-header">
+        <h2>Export / Save</h2>
+        <p>Download updated files to deploy</p>
+      </div>
+      <p style="font-size:0.85rem;color:var(--text-2);margin-bottom:2rem">
+        This CMS works client-side. When you save changes, files are prepared for download.
+        Replace the corresponding files in your project folder, then deploy.
+      </p>
+
+      <div class="card" style="cursor:pointer" onclick="exportManifest()">
+        <div class="card__header">
+          <div class="card__title">manifest.json</div>
+          <span class="btn btn--sm">Download</span>
+        </div>
+        <div class="card__desc">Updated case study index with all metadata, tags, and integration links.</div>
+      </div>
+
+      <div class="card" style="cursor:pointer" onclick="exportAllCaseStudies()">
+        <div class="card__header">
+          <div class="card__title">All case study .md files</div>
+          <span class="btn btn--sm">Download ZIP</span>
+        </div>
+        <div class="card__desc">Individual markdown files for each case study.</div>
+      </div>
+
+      <div class="card" style="cursor:pointer" onclick="exportSiteContent()">
+        <div class="card__header">
+          <div class="card__title">site-content.json</div>
+          <span class="btn btn--sm">Download</span>
+        </div>
+        <div class="card__desc">Hero, about, and experience content as structured JSON. Use to update index.html.</div>
+      </div>
+
+      <div class="card" style="cursor:pointer" onclick="exportImages()">
+        <div class="card__header">
+          <div class="card__title">Uploaded images</div>
+          <span class="btn btn--sm">Download</span>
+        </div>
+        <div class="card__desc">Any images uploaded this session, ready to place in your images/ folder.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== CONFIG =====
+// Change this passphrase. In production, use a proper auth system.
+const ADMIN_PASSPHRASE = 'chiranjeet2026';
+
+// ===== STATE =====
+let manifest = { generated: new Date().toISOString(), studies: [] };
+let caseContents = {};  // id -> markdown string
+let uploadedImages = []; // { name, dataUrl, path }
+let currentEditId = null;
+let experienceEntries = [
+  { period: '2022 - Present', role: 'Experience Design Lead / Manager', company: '[Update with company]', desc: 'Leading design for complex digital products. Managing cross-functional teams, establishing design systems, and integrating AI-assisted workflows.' },
+  { period: '2018 - 2022', role: 'Senior UX Designer / Design Lead', company: '[Update with company]', desc: 'Product design across enterprise and consumer platforms. Led research initiatives, IA restructuring, and conversion optimization.' },
+  { period: '2013 - 2018', role: 'UX Designer / Product Designer', company: '[Update with company]', desc: 'Designed fintech portals, edtech platforms, and enterprise tools.' },
+  { period: '2010 - 2013', role: 'Designer', company: '[Update with company]', desc: 'Early career across visual design, branding, and front-end development.' }
+];
+
+// ===== AUTH =====
+function authenticate() {
+  const val = document.getElementById('authInput').value;
+  if (val === ADMIN_PASSPHRASE) {
+    document.getElementById('authGate').style.display = 'none';
+    document.getElementById('adminPanel').classList.add('active');
+    loadManifest();
+  } else {
+    document.getElementById('authError').style.display = 'block';
+    document.getElementById('authInput').value = '';
+    document.getElementById('authInput').focus();
+  }
+}
+document.getElementById('authInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') authenticate();
+});
+
+// ===== NAVIGATION =====
+function switchPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar__item').forEach(i => i.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+}
+
+function switchTab(btn, tabId) {
+  const bar = btn.parentElement;
+  const container = bar.parentElement;
+  bar.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  container.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+}
+
+// ===== TOAST =====
+function toast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' visible';
+  setTimeout(() => t.classList.remove('visible'), 2500);
+}
+
+// ===== MANIFEST LOADER =====
+async function loadManifest() {
+  try {
+    const res = await fetch('case-studies/manifest.json');
+    if (res.ok) {
+      manifest = await res.json();
+      // Load content for each study
+      for (const s of manifest.studies) {
+        try {
+          const r = await fetch(s.file);
+          if (r.ok) caseContents[s.id] = await r.text();
+        } catch (e) { /* skip */ }
+      }
+    }
+  } catch (e) { /* fresh start */ }
+  renderDashboard();
+  renderCaseList();
+  renderExpList();
+}
+
+// ===== DASHBOARD =====
+function renderDashboard() {
+  document.getElementById('stat-studies').textContent = manifest.studies.length;
+  document.getElementById('stat-images').textContent = uploadedImages.length;
+  const totalWords = Object.values(caseContents).join(' ').split(/\s+/).filter(w => w).length;
+  document.getElementById('stat-words').textContent = totalWords.toLocaleString();
+}
+
+// ===== CASE STUDY LIST =====
+function renderCaseList() {
+  const list = document.getElementById('cs-list');
+  if (manifest.studies.length === 0) {
+    list.innerHTML = '<div class="empty-state"><p>No case studies yet.</p></div>';
+    return;
+  }
+  list.innerHTML = manifest.studies.map(s => `
+    <div class="card" onclick="showCaseEditor('${s.id}')" style="cursor:pointer">
+      <div class="card__header">
+        <div class="card__title">${s.title}</div>
+        <div class="card__meta">${s.year || ''} / ${s.type || ''}</div>
+      </div>
+      <div class="card__desc">${s.summary || ''}</div>
+      <div style="display:flex;gap:0.3rem;flex-wrap:wrap">
+        ${(s.tags||[]).map(t => '<span style="font-size:0.7rem;font-family:var(--mono);color:var(--text-3);background:var(--bg);padding:0.15rem 0.5rem;border-radius:3px;border:1px solid var(--border)">'+t+'</span>').join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== CASE EDITOR =====
+function showCaseEditor(id) {
+  document.getElementById('cs-list-view').style.display = 'none';
+  document.getElementById('cs-editor-view').style.display = 'block';
+
+  currentEditId = id;
+  const isNew = !id;
+
+  document.getElementById('cs-delete-btn').style.display = isNew ? 'none' : 'inline-flex';
+
+  if (isNew) {
+    document.getElementById('cs-title').value = '';
+    document.getElementById('cs-year').value = '';
+    document.getElementById('cs-type').value = 'Product Design';
+    document.getElementById('cs-domain').value = '';
+    document.getElementById('cs-summary').value = '';
+    document.getElementById('cs-tags').value = '';
+    document.getElementById('cs-thumbnail').value = '';
+    document.getElementById('cs-markdown').value = getDefaultCaseTemplate();
+    document.getElementById('cs-images').value = '';
+    document.getElementById('cs-figma').value = '';
+    document.getElementById('cs-figma-embed').value = '';
+    document.getElementById('cs-framer').value = '';
+    document.getElementById('cs-extra-links').value = '';
+  } else {
+    const s = manifest.studies.find(x => x.id === id);
+    if (!s) return;
+    document.getElementById('cs-title').value = s.title || '';
+    document.getElementById('cs-year').value = s.year || '';
+    document.getElementById('cs-type').value = s.type || '';
+    document.getElementById('cs-domain').value = s.domain || '';
+    document.getElementById('cs-summary').value = s.summary || '';
+    document.getElementById('cs-tags').value = (s.tags || []).join(', ');
+    document.getElementById('cs-thumbnail').value = s.thumbnail || '';
+    document.getElementById('cs-markdown').value = caseContents[id] || '';
+    document.getElementById('cs-images').value = (s.images || []).join('\n');
+    document.getElementById('cs-figma').value = (s.links && s.links.figma) || '';
+    document.getElementById('cs-figma-embed').value = (s.links && s.links.figmaEmbed) || '';
+    document.getElementById('cs-framer').value = (s.links && s.links.framer) || '';
+    document.getElementById('cs-extra-links').value = (s.links && s.links.extra) ? JSON.stringify(s.links.extra, null, 2) : '';
+  }
+  updateCasePreview();
+}
+
+function hideCaseEditor() {
+  document.getElementById('cs-list-view').style.display = 'block';
+  document.getElementById('cs-editor-view').style.display = 'none';
+  currentEditId = null;
+}
+
+function saveCaseStudy() {
+  const title = document.getElementById('cs-title').value.trim();
+  if (!title) { toast('Title is required', 'error'); return; }
+
+  const id = currentEditId || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const tags = document.getElementById('cs-tags').value.split(',').map(t => t.trim()).filter(t => t);
+  const images = document.getElementById('cs-images').value.split('\n').map(l => l.trim()).filter(l => l);
+
+  let extraLinks = [];
+  try {
+    const raw = document.getElementById('cs-extra-links').value.trim();
+    if (raw) extraLinks = JSON.parse(raw);
+  } catch (e) { /* skip */ }
+
+  const study = {
+    id,
+    title,
+    year: document.getElementById('cs-year').value.trim(),
+    type: document.getElementById('cs-type').value.trim(),
+    domain: document.getElementById('cs-domain').value.trim(),
+    summary: document.getElementById('cs-summary').value.trim(),
+    tags,
+    thumbnail: document.getElementById('cs-thumbnail').value.trim() || null,
+    file: 'case-studies/' + id + '.md',
+    images,
+    links: {
+      figma: document.getElementById('cs-figma').value.trim() || null,
+      figmaEmbed: document.getElementById('cs-figma-embed').value.trim() || null,
+      framer: document.getElementById('cs-framer').value.trim() || null,
+      extra: extraLinks.length ? extraLinks : null
+    }
+  };
+
+  // Update or add
+  const idx = manifest.studies.findIndex(s => s.id === id);
+  if (idx >= 0) {
+    manifest.studies[idx] = study;
+  } else {
+    manifest.studies.push(study);
+  }
+
+  caseContents[id] = document.getElementById('cs-markdown').value;
+  manifest.generated = new Date().toISOString();
+
+  currentEditId = id;
+  renderCaseList();
+  renderDashboard();
+  toast('Case study saved');
+}
+
+function deleteCaseStudy() {
+  if (!currentEditId) return;
+  if (!confirm('Delete this case study? This cannot be undone.')) return;
+  manifest.studies = manifest.studies.filter(s => s.id !== currentEditId);
+  delete caseContents[currentEditId];
+  manifest.generated = new Date().toISOString();
+  hideCaseEditor();
+  renderCaseList();
+  renderDashboard();
+  toast('Case study deleted');
+}
+
+function updateCasePreview() {
+  const md = document.getElementById('cs-markdown').value;
+  const preview = document.getElementById('cs-preview');
+  if (typeof marked !== 'undefined') {
+    preview.innerHTML = marked.parse(md);
+  } else {
+    preview.textContent = md;
+  }
+}
+
+function getDefaultCaseTemplate() {
+  return `# [Project Title]
+
+**Year:** [Year]
+**Type:** Product Design
+**Domain:** [Industry]
+**Role:** [Your Role]
+
+---
+
+## Context and Constraints
+
+[Describe the business context, team size, timeline, and key constraints.]
+
+## The Real Problem
+
+[What was actually broken? Not the symptom, the root issue.]
+
+## Evidence and Inputs
+
+- [Research conducted]
+- [Analytics reviewed]
+- [Stakeholder inputs]
+
+## Options Considered
+
+1. **Option A**: [Description and tradeoffs]
+2. **Option B**: [Description and tradeoffs]
+3. **Option C**: [Description and tradeoffs]
+
+[Which was chosen and why?]
+
+## Execution
+
+[What actually happened during implementation? What broke? How was it navigated?]
+
+## Outcomes
+
+- [Measurable result with source]
+- [Secondary outcome]
+- [What could not be measured and why]
+
+## Lessons
+
+[What would you do differently? What surprised you?]
+`;
+}
+
+// ===== EXPERIENCE LIST =====
+function renderExpList() {
+  const list = document.getElementById('exp-list');
+  list.innerHTML = experienceEntries.map((e, i) => `
+    <div class="card">
+      <div class="form-row" style="margin-bottom:0.75rem">
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Period</label>
+          <input class="form-input" value="${e.period}" onchange="experienceEntries[${i}].period=this.value">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">Role</label>
+          <input class="form-input" value="${e.role}" onchange="experienceEntries[${i}].role=this.value">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:0.75rem">
+        <label class="form-label">Company</label>
+        <input class="form-input" value="${e.company}" onchange="experienceEntries[${i}].company=this.value">
+      </div>
+      <div class="form-group" style="margin-bottom:0.5rem">
+        <label class="form-label">Description</label>
+        <textarea class="form-textarea" rows="2" onchange="experienceEntries[${i}].desc=this.value">${e.desc}</textarea>
+      </div>
+      <button class="btn btn--danger btn--sm" onclick="experienceEntries.splice(${i},1);renderExpList()">Remove</button>
+    </div>
+  `).join('');
+}
+
+function addExpEntry() {
+  experienceEntries.push({ period: '', role: '', company: '', desc: '' });
+  renderExpList();
+}
+
+// ===== SITE CONTENT =====
+function saveSiteContent() {
+  toast('Site content saved to session. Use Export to download.');
+}
+
+// ===== IMAGES =====
+function handleImageUpload(input) {
+  const files = Array.from(input.files);
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      uploadedImages.push({
+        name: file.name,
+        dataUrl: e.target.result,
+        path: 'images/case-studies/' + file.name
+      });
+      renderImageGallery();
+      renderDashboard();
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+function renderImageGallery() {
+  const gallery = document.getElementById('image-gallery');
+  const empty = document.getElementById('image-empty');
+  if (uploadedImages.length === 0) {
+    gallery.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  gallery.innerHTML = uploadedImages.map((img, i) => `
+    <div class="image-thumb" onclick="copyToClipboard('${img.path}')">
+      <img src="${img.dataUrl}" alt="${img.name}">
+      <div class="image-thumb__name">${img.name}</div>
+    </div>
+  `).join('');
+}
+
+// ===== GOOGLE DOCS IMPORT =====
+function convertPastedContent() {
+  const raw = document.getElementById('gdocs-paste').value;
+  if (!raw.trim()) { toast('Paste content first', 'error'); return; }
+  const md = htmlToMarkdown(raw);
+  document.getElementById('gdocs-result').value = md;
+  document.getElementById('gdocs-result-group').hidden = false;
+  toast('Converted to Markdown');
+}
+
+async function fetchGoogleDoc() {
+  const url = document.getElementById('gdocs-url').value.trim();
+  if (!url) { toast('Enter a published URL', 'error'); return; }
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Fetch failed');
+    const html = await res.text();
+    const md = htmlToMarkdown(html);
+    document.getElementById('gdocs-url-result').value = md;
+    document.getElementById('gdocs-url-result-group').hidden = false;
+    toast('Fetched and converted');
+  } catch (e) {
+    toast('Could not fetch. Is the doc published to web?', 'error');
+  }
+}
+
+function htmlToMarkdown(html) {
+  // Lightweight HTML to Markdown converter
+  let text = html;
+  // Remove scripts and styles
+  text = text.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+  text = text.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+  // Headings
+  text = text.replace(/<h1[^>]*>(.*?)<\/h1>/gi, '# $1\n\n');
+  text = text.replace(/<h2[^>]*>(.*?)<\/h2>/gi, '## $1\n\n');
+  text = text.replace(/<h3[^>]*>(.*?)<\/h3>/gi, '### $1\n\n');
+  text = text.replace(/<h4[^>]*>(.*?)<\/h4>/gi, '#### $1\n\n');
+  // Bold and italic
+  text = text.replace(/<(strong|b)[^>]*>(.*?)<\/(strong|b)>/gi, '**$2**');
+  text = text.replace(/<(em|i)[^>]*>(.*?)<\/(em|i)>/gi, '*$2*');
+  // Links
+  text = text.replace(/<a[^>]+href="([^"]*)"[^>]*>(.*?)<\/a>/gi, '[$2]($1)');
+  // Images
+  text = text.replace(/<img[^>]+src="([^"]*)"[^>]*alt="([^"]*)"[^>]*>/gi, '![$2]($1)');
+  text = text.replace(/<img[^>]+src="([^"]*)"[^>]*>/gi, '![]($1)');
+  // List items
+  text = text.replace(/<li[^>]*>(.*?)<\/li>/gi, '- $1\n');
+  // Paragraphs and breaks
+  text = text.replace(/<br\s*\/?>/gi, '\n');
+  text = text.replace(/<p[^>]*>(.*?)<\/p>/gi, '$1\n\n');
+  text = text.replace(/<div[^>]*>(.*?)<\/div>/gi, '$1\n');
+  // Remove remaining tags
+  text = text.replace(/<[^>]+>/g, '');
+  // Decode entities
+  text = text.replace(/&amp;/g, '&');
+  text = text.replace(/&lt;/g, '<');
+  text = text.replace(/&gt;/g, '>');
+  text = text.replace(/&quot;/g, '"');
+  text = text.replace(/&nbsp;/g, ' ');
+  text = text.replace(/&#39;/g, "'");
+  // Clean up whitespace
+  text = text.replace(/\n{3,}/g, '\n\n');
+  return text.trim();
+}
+
+function importToNewCase() {
+  const md = document.getElementById('gdocs-result').value;
+  switchPage('case-studies', document.querySelector('[data-page=case-studies]'));
+  showCaseEditor(null);
+  document.getElementById('cs-markdown').value = md;
+  updateCasePreview();
+  toast('Content imported. Fill in metadata and save.');
+}
+function importToNewCaseFromUrl() {
+  const md = document.getElementById('gdocs-url-result').value;
+  switchPage('case-studies', document.querySelector('[data-page=case-studies]'));
+  showCaseEditor(null);
+  document.getElementById('cs-markdown').value = md;
+  updateCasePreview();
+  toast('Content imported. Fill in metadata and save.');
+}
+
+// ===== EXPORT =====
+function downloadFile(filename, content, type = 'application/json') {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportManifest() {
+  downloadFile('manifest.json', JSON.stringify(manifest, null, 2));
+  toast('manifest.json downloaded');
+}
+
+function exportAllCaseStudies() {
+  // Download each as individual files since we cannot create ZIPs without a library
+  Object.entries(caseContents).forEach(([id, md]) => {
+    downloadFile(id + '.md', md, 'text/markdown');
+  });
+  toast(Object.keys(caseContents).length + ' file(s) downloaded');
+}
+
+function exportSiteContent() {
+  const content = {
+    hero: {
+      eyebrow: document.getElementById('hero-eyebrow').value,
+      firstName: document.getElementById('hero-firstname').value,
+      lastName: document.getElementById('hero-lastname').value,
+      tagline: document.getElementById('hero-tagline').value,
+      location: document.getElementById('hero-location').value,
+      experience: document.getElementById('hero-experience').value,
+      focus: document.getElementById('hero-focus').value,
+      cta1: document.getElementById('hero-cta1').value,
+      cta2: document.getElementById('hero-cta2').value
+    },
+    about: {
+      heading: document.getElementById('about-heading').value,
+      body: document.getElementById('about-body').value
+    },
+    experience: experienceEntries
+  };
+  downloadFile('site-content.json', JSON.stringify(content, null, 2));
+  toast('site-content.json downloaded');
+}
+
+function exportImages() {
+  if (uploadedImages.length === 0) { toast('No images to export', 'error'); return; }
+  uploadedImages.forEach(img => {
+    const a = document.createElement('a');
+    a.href = img.dataUrl;
+    a.download = img.name;
+    a.click();
+  });
+  toast(uploadedImages.length + ' image(s) downloaded');
+}
+
+// ===== UTILITY =====
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => toast('Copied: ' + text));
+}
+</script>
+</body>
+</html>
