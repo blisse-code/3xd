@@ -141,25 +141,32 @@ Keep responses brief (2-4 sentences typical). Offer to go deeper if the visitor 
         })
       });
 
-      if (!response.ok) {
-        throw new Error('API error: ' + response.status);
+      // Try to parse response regardless of status code
+      let data;
+      try { data = await response.json(); } catch (parseErr) { data = null; }
+
+      // Extract text from response if available
+      if (data && data.content && Array.isArray(data.content)) {
+        var assistantMessage = data.content
+          .filter(function(b) { return b.type === 'text'; })
+          .map(function(b) { return b.text; })
+          .join('');
+        if (assistantMessage) {
+          conversationHistory.push({ role: 'assistant', content: assistantMessage });
+          return assistantMessage;
+        }
       }
 
-      const data = await response.json();
-      const assistantMessage = data.content
-        .filter(b => b.type === 'text')
-        .map(b => b.text)
-        .join('');
-
-      conversationHistory.push({ role: 'assistant', content: assistantMessage });
-      return assistantMessage;
+      // If we got here, response had no usable content
+      conversationHistory.pop();
+      var email = (knowledge && knowledge.contact && knowledge.contact.email) || 'be.chiranjeet@outlook.com';
+      return 'I could not get a response right now. You can reach Chiranjeet at [' + email + '](mailto:' + email + ') or [book a call](https://calendly.com/meetchiranjeet/30min).';
 
     } catch (e) {
       console.error('Chat API error:', e);
-      conversationHistory.pop(); // Remove failed user message
-      return 'I am having trouble connecting right now. You can reach Chiranjeet directly at ' +
-        ((knowledge && knowledge.contact && knowledge.contact.email) || 'hello@chiranjeetbanerjee.com') +
-        ' or book a call via Calendly.';
+      conversationHistory.pop();
+      var email2 = (knowledge && knowledge.contact && knowledge.contact.email) || 'be.chiranjeet@outlook.com';
+      return 'I could not connect right now. You can reach Chiranjeet at [' + email2 + '](mailto:' + email2 + ') or [book a call](https://calendly.com/meetchiranjeet/30min).';
     }
   }
 
