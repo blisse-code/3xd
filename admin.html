@@ -2674,14 +2674,7 @@ function formatTime(isoStr) {
   } catch (e) { return isoStr; }
 }
 
-// ===== ENHANCED LOAD =====
-const origLoadManifest = loadManifest;
-loadManifest = async function() {
-  await origLoadManifest();
-  await loadKnowledgeBase();
-  await loadAvailability();
-  refreshInsights();
-};
+// (loadManifest enhanced at end of script)
 
 // ===== ENHANCED EXPORT (include icons + knowledge + availability) =====
 const origExportSiteContent = exportSiteContent;
@@ -2763,13 +2756,7 @@ function deploySiteConfig() {
   ], 'Update site config (GA, resume, logo)');
 }
 
-// Init config load
-const origLoadManifest2 = loadManifest;
-loadManifest = async function() {
-  await origLoadManifest2();
-  await loadSiteConfig();
-  renderDeployFileList();
-};
+// Init config load (consolidated at end of script)
 
 // ===== ONE-CLICK DEPLOY =====
 const DEPLOY_ENDPOINT = '/api/deploy';
@@ -3061,11 +3048,16 @@ function logout() {
   toast('Logged out');
 }
 
-// ===== ENHANCED LOAD - add social links =====
-var origLoadManifest2 = loadManifest;
+// ===== CONSOLIDATED LOAD (single override, no duplicate declarations) =====
+var _baseLoadManifest = loadManifest;
 loadManifest = async function() {
-  await origLoadManifest2();
-  await loadSocialLinks();
+  await _baseLoadManifest();
+  try { await loadKnowledgeBase(); } catch(e) {}
+  try { await loadAvailability(); } catch(e) {}
+  try { await loadSiteConfig(); } catch(e) {}
+  try { await loadSocialLinks(); } catch(e) {}
+  try { renderDeployFileList(); } catch(e) {}
+  try { refreshInsights(); } catch(e) {}
 };
 </script>
 </body>
