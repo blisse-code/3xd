@@ -109,7 +109,69 @@
     {
       "q": "What tools and methods does Chiranjeet use?",
       "a": "Figma for design, various research and synthesis methods including affinity mapping, card sorting, and usability testing. Uses RICE, Kano, and MoSCoW for prioritization. Design systems thinking with tokens and components."
+    },
+    {
+      "q": "Can I check if Chiranjeet is a good fit for my role or project?",
+      "a": "Yes. Share the job description or project requirements and I can evaluate alignment with Chiranjeet's skills, experience, and interests. I will be honest about both fit and areas that may not align."
     }
   ],
+  "socialLinks": [
+    { "label": "LinkedIn", "url": "https://linkedin.com/in/chiranjeetbanerjee" },
+    { "label": "Instagram", "url": "https://instagram.com/broekncamera" },
+    { "label": "Substack", "url": "https://blissecode.substack.com" },
+    { "label": "Threads", "url": "https://threads.net" }
+  ],
+  "articles": [
+    {
+      "title": "The Compliance Flow and the Boardroom Are the Same Design Problem",
+      "url": "https://blissecode.substack.com/p/the-compliance-flow-and-the-boardroom",
+      "source": "Substack",
+      "date": "2026-02-28",
+      "summary": "Why the most important screen you will ever design is the one your stakeholder never sees. Explores how regulated product onboarding flows balloon from 4 steps to 15 screens through structural misalignment between compliance, product, and design."
+    },
+    {
+      "title": "Thermodynamics of AI: Why You Are Exhausted",
+      "url": "https://blissecode.substack.com/p/thermodynamics-of-ai",
+      "source": "Substack",
+      "date": "2026-02-12",
+      "summary": "AI drove production cost to zero but verification cost stayed the same. Explains the Production-Verification Paradox and why senior professionals feel more depleted despite producing more artifacts than ever."
+    },
+    {
+      "title": "The Cargo Cult of AI",
+      "url": "https://blissecode.substack.com/p/the-cargo-cult-of-ai",
+      "source": "Substack",
+      "date": "2026-02-11",
+      "summary": "Why prompt libraries are a trap and fluency is the only way out. Argues that treating AI with rigid templated scripts is the equivalent of cargo cult behavior."
+    }
+  ],
+  "jobFit": {
+    "strongFit": [
+      "Experience Design Lead / Manager",
+      "Head of Experience Design",
+      "Principal Designer",
+      "Senior AI Consultant (design-led)",
+      "Design Strategy Lead",
+      "UX Research Lead (with design overlap)",
+      "Product Design Director",
+      "Creative Director (digital, editorial)"
+    ],
+    "notInPurview": [
+      "Pure software engineering or backend development roles",
+      "Data science or ML engineering without design context",
+      "Junior or mid-level individual contributor positions",
+      "Marketing-only roles without product design overlap",
+      "Roles requiring relocation outside Southeast Asia (open to remote)",
+      "Mass-market content production or social media management",
+      "Sales or business development roles"
+    ],
+    "evaluationCriteria": [
+      "Does the role involve design leadership, strategy, or systems thinking?",
+      "Is there cross-functional collaboration with product, engineering, and research?",
+      "Does it require evidence-based decision making rather than trend following?",
+      "Is there room for AI workflow integration or design innovation?",
+      "Does the scope match 13+ years of experience in UX, IA, and product design?",
+      "Is the work premium, selective, and quality-focused?"
+    ]
+  },
   "customFacts": []
 }

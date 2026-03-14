@@ -1,7 +1,12 @@
 {
   "gaId": "",
-  "resumeUrl": "https://1drv.ms/b/s!ApFzwek6mhc9-EdCH4TuCHVGZfsT?e=WaDE8g",
+  "resumeUrl": "",
   "logoPath": "",
   "faviconPath": "icons/favicon.png",
-  "appleTouchIconPath": "icons/apple-touch-icon.png"
+  "socialLinks": [
+    { "label": "LinkedIn", "url": "https://linkedin.com/in/chiranjeetbanerjee" },
+    { "label": "Instagram", "url": "https://instagram.com/broekncamera" },
+    { "label": "Substack", "url": "https://blissecode.substack.com" },
+    { "label": "Threads", "url": "https://threads.net" }
+  ]
 }
