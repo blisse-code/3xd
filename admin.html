@@ -458,6 +458,26 @@
     }
     .empty-state p { font-size: 0.85rem; margin-bottom: 1rem; }
 
+    /* ---- VISUAL EDITOR ---- */
+    #ve-editor h2 { font-size: 1.3rem; font-weight: 600; margin: 1.25rem 0 0.5rem; color: var(--text); }
+    #ve-editor h3 { font-size: 1.1rem; font-weight: 600; margin: 1rem 0 0.4rem; color: var(--text); }
+    #ve-editor p { margin-bottom: 0.6rem; }
+    #ve-editor ul, #ve-editor ol { padding-left: 1.5rem; margin-bottom: 0.6rem; }
+    #ve-editor li { margin-bottom: 0.3rem; }
+    #ve-editor blockquote { border-left: 3px solid var(--accent); padding-left: 1rem; margin: 0.75rem 0; color: var(--text-2); font-style: italic; }
+    #ve-editor strong { font-weight: 600; color: var(--text); }
+    #ve-editor a { color: var(--accent); text-decoration: underline; }
+    #ve-editor hr { border: none; height: 1px; background: var(--border); margin: 1.5rem 0; }
+    #ve-editor img { max-width: 100%; border-radius: 8px; margin: 0.75rem 0; cursor: pointer; }
+    #ve-editor:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(201,168,76,0.15); }
+    #ve-editor figure { margin: 1rem 0; }
+    #ve-editor figure:hover { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+    #ve-editor figcaption { font-size: 0.8rem; color: var(--text-3); text-align: center; margin-top: 0.4rem; }
+    #ve-editor:empty::before,
+    #ve-editor:has(> br:only-child)::before { content: 'Start writing your case study...'; color: var(--text-3); font-style: italic; pointer-events: none; display: block; }
+    #ve-toolbar .btn--sm:active { background: var(--accent); color: var(--bg); transform: scale(0.95); }
+    #ve-toolbar .btn--sm:hover { background: rgba(201,168,76,0.15); color: var(--accent); }
+
     /* ---- RESPONSIVE ---- */
     @media (max-width: 768px) {
       .admin.active { flex-direction: column; }
@@ -486,8 +506,12 @@
     <h1>Portfolio Admin</h1>
     <p>Chiranjeet Banerjee CMS</p>
     <div class="auth-error" id="authError">Incorrect passphrase</div>
-    <input type="password" id="authInput" placeholder="Enter passphrase" autofocus>
+    <div style="position:relative">
+      <input type="password" id="authInput" placeholder="Passphrase" autofocus>
+      <button type="button" onclick="var i=document.getElementById('authInput');i.type=i.type==='password'?'text':'password';this.textContent=i.type==='password'?'Show':'Hide'" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-3);font-size:0.7rem;cursor:pointer;font-family:var(--mono)">Show</button>
+    </div>
     <button class="btn btn--primary" style="width:100%" onclick="authenticate()">Unlock</button>
+    <p style="margin-top:0.75rem;font-size:0.65rem;color:var(--text-3)">Access restricted to site owner</p>
   </div>
 </div>
 
@@ -752,13 +776,119 @@
         </div>
 
         <div class="tab-panel" id="cs-tab-content">
-          <div class="form-group">
-            <label class="form-label">Case study content (Markdown)</label>
-            <textarea class="form-textarea tall" id="cs-markdown" oninput="updateCasePreview()" style="min-height:400px"></textarea>
-            <div class="form-help">Write in Markdown. Use # for headings, **bold**, *italic*, - for lists.</div>
+          <!-- Editor mode toggle -->
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem">
+            <div style="display:flex;gap:0">
+              <button class="tab-btn active" id="ve-mode-visual" onclick="setEditorMode('visual')" style="border-bottom:none;padding:0.4rem 0.8rem;font-size:0.75rem">Visual Editor</button>
+              <button class="tab-btn" id="ve-mode-source" onclick="setEditorMode('source')" style="border-bottom:none;padding:0.4rem 0.8rem;font-size:0.75rem">Markdown Source</button>
+            </div>
+            <span style="font-size:0.65rem;color:var(--text-3);font-family:var(--mono)" id="ve-wordcount">0 words</span>
           </div>
-          <label class="form-label">Live preview</label>
-          <div class="preview-pane" id="cs-preview"></div>
+
+          <!-- Visual editor toolbar -->
+          <div id="ve-toolbar" style="display:flex;flex-wrap:wrap;gap:2px;padding:0.5rem;background:var(--bg);border:1px solid var(--border);border-bottom:none;border-radius:var(--radius) var(--radius) 0 0">
+            <button class="btn btn--sm" onclick="veCmd('h2')" title="Heading 2" style="min-width:32px">H2</button>
+            <button class="btn btn--sm" onclick="veCmd('h3')" title="Heading 3" style="min-width:32px">H3</button>
+            <span style="width:1px;background:var(--border);margin:0 4px"></span>
+            <button class="btn btn--sm" onclick="veCmd('bold')" title="Bold" style="min-width:32px;font-weight:700">B</button>
+            <button class="btn btn--sm" onclick="veCmd('italic')" title="Italic" style="min-width:32px;font-style:italic">I</button>
+            <span style="width:1px;background:var(--border);margin:0 4px"></span>
+            <button class="btn btn--sm" onclick="veCmd('ul')" title="Bullet list" style="min-width:32px">&bull;</button>
+            <button class="btn btn--sm" onclick="veCmd('ol')" title="Numbered list" style="min-width:32px">1.</button>
+            <button class="btn btn--sm" onclick="veCmd('quote')" title="Blockquote" style="min-width:32px">&ldquo;</button>
+            <button class="btn btn--sm" onclick="veCmd('hr')" title="Divider" style="min-width:32px">&mdash;</button>
+            <span style="width:1px;background:var(--border);margin:0 4px"></span>
+            <button class="btn btn--sm" onclick="veCmd('link')" title="Insert link" style="min-width:32px">&#128279;</button>
+            <button class="btn btn--sm" onclick="showImageInsert()" title="Insert image" style="min-width:32px;color:var(--accent)">&#128247;</button>
+          </div>
+
+          <!-- Visual editing area -->
+          <div id="ve-visual-area">
+            <div contenteditable="true" id="ve-editor" style="min-height:450px;max-height:70vh;overflow-y:auto;padding:1.5rem;background:var(--bg-input);border:1px solid var(--border);border-radius:0 0 var(--radius) var(--radius);color:var(--text);font-family:var(--font);font-size:0.9rem;line-height:1.7;outline:none" oninput="onVisualEdit()"></div>
+          </div>
+
+          <!-- Source editing area (hidden by default) -->
+          <div id="ve-source-area" style="display:none">
+            <textarea class="form-textarea tall" id="cs-markdown" oninput="updateCasePreview();updateWordCount()" style="min-height:450px;border-radius:0 0 var(--radius) var(--radius)"></textarea>
+          </div>
+
+          <!-- Image insertion dialog -->
+          <div id="ve-image-dialog" style="display:none;margin-top:0.75rem;padding:1rem;background:var(--bg-el);border:1px solid var(--border);border-radius:var(--radius)">
+            <h4 style="font-size:0.85rem;margin-bottom:0.75rem;color:var(--text)">Insert Image</h4>
+            <div class="tab-bar" style="margin-bottom:0.75rem">
+              <button class="tab-btn active" onclick="switchTab(this,'ve-img-upload')">Upload</button>
+              <button class="tab-btn" onclick="switchTab(this,'ve-img-url')">From URL</button>
+              <button class="tab-btn" onclick="switchTab(this,'ve-img-ai')">Generate with AI</button>
+            </div>
+
+            <div class="tab-panel active" id="ve-img-upload">
+              <input type="file" id="ve-img-file" accept="image/*" class="form-input" style="padding:0.4rem;font-size:0.8rem" onchange="onVeImageSelected(this)">
+              <div id="ve-img-upload-preview" style="margin-top:0.5rem"></div>
+            </div>
+
+            <div class="tab-panel" id="ve-img-url">
+              <input class="form-input" id="ve-img-url-input" placeholder="https://example.com/image.jpg" style="font-size:0.85rem">
+            </div>
+
+            <div class="tab-panel" id="ve-img-ai">
+              <div class="form-group" style="margin-bottom:0.5rem">
+                <input class="form-input" id="ve-img-ai-prompt" placeholder="Describe the image you need..." style="font-size:0.85rem">
+              </div>
+              <button class="btn btn--sm btn--primary" onclick="generateVeImage()" id="ve-img-ai-btn">Generate</button>
+              <div id="ve-img-ai-preview" style="margin-top:0.5rem"></div>
+            </div>
+
+            <!-- Image settings (shared across all insert methods) -->
+            <div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--border)">
+              <div class="form-row" style="margin-bottom:0.5rem">
+                <div class="form-group" style="margin-bottom:0">
+                  <label class="form-label">Orientation</label>
+                  <select class="form-select" id="ve-img-orientation" style="font-size:0.8rem" onchange="updateImgPreviewSize()">
+                    <option value="landscape">Landscape (16:9)</option>
+                    <option value="portrait">Portrait (9:16)</option>
+                    <option value="square">Square (1:1)</option>
+                    <option value="wide">Wide banner (21:9)</option>
+                    <option value="original">Original ratio</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                  <label class="form-label">Display size</label>
+                  <select class="form-select" id="ve-img-size" style="font-size:0.8rem">
+                    <option value="full">Full width</option>
+                    <option value="large">Large (80%)</option>
+                    <option value="medium">Medium (60%)</option>
+                    <option value="small">Small (40%)</option>
+                    <option value="inline-left">Inline left</option>
+                    <option value="inline-right">Inline right</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group" style="margin-bottom:0.5rem">
+                <label class="form-label">Alt text (accessibility)</label>
+                <input class="form-input" id="ve-img-alt" placeholder="Describe the image for screen readers" style="font-size:0.8rem">
+              </div>
+              <div class="form-group" style="margin-bottom:0.5rem">
+                <label class="form-label">Caption (optional)</label>
+                <input class="form-input" id="ve-img-caption" placeholder="Shown below the image" style="font-size:0.8rem">
+              </div>
+              <!-- Size preview -->
+              <div id="ve-img-size-preview" style="margin:0.5rem 0;padding:0.75rem;background:var(--bg);border:1px dashed var(--border);border-radius:var(--radius);text-align:center">
+                <div style="display:inline-block;background:var(--border);border-radius:4px;position:relative;overflow:hidden;width:160px;height:90px" id="ve-img-ratio-box">
+                  <div style="font-size:0.65rem;color:var(--text-3);position:absolute;inset:0;display:flex;align-items:center;justify-content:center">16:9</div>
+                </div>
+              </div>
+              <div class="btn-group">
+                <button class="btn btn--primary btn--sm" onclick="insertEditorImage()">Insert image</button>
+                <button class="btn btn--sm" onclick="hideImageInsert()">Cancel</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Live preview -->
+          <details style="margin-top:1rem">
+            <summary style="font-size:0.75rem;color:var(--text-3);cursor:pointer;font-family:var(--mono);letter-spacing:0.05em">RENDERED PREVIEW</summary>
+            <div class="preview-pane" id="cs-preview" style="margin-top:0.5rem"></div>
+          </details>
         </div>
 
         <div class="tab-panel" id="cs-tab-images">
@@ -1615,6 +1745,12 @@ function hideCaseEditor() {
 }
 
 function saveCaseStudy() {
+  // Force sync visual editor to markdown if in visual mode
+  if (editorMode === 'visual') {
+    var html = document.getElementById('ve-editor').innerHTML;
+    document.getElementById('cs-markdown').value = htmlToMd(html);
+  }
+
   const title = document.getElementById('cs-title').value.trim();
   if (!title) { toast('Title is required', 'error'); return; }
 
@@ -1684,7 +1820,294 @@ function updateCasePreview() {
   } else {
     preview.textContent = md;
   }
+  updateWordCount();
 }
+
+// ===== VISUAL EDITOR =====
+let editorMode = 'visual';
+let veImageData = null; // Holds uploaded/generated image data for insertion
+
+function setEditorMode(mode) {
+  editorMode = mode;
+  document.getElementById('ve-mode-visual').classList.toggle('active', mode === 'visual');
+  document.getElementById('ve-mode-source').classList.toggle('active', mode === 'source');
+  document.getElementById('ve-visual-area').style.display = mode === 'visual' ? '' : 'none';
+  document.getElementById('ve-source-area').style.display = mode === 'source' ? '' : 'none';
+  document.getElementById('ve-toolbar').style.display = mode === 'visual' ? '' : 'none';
+
+  if (mode === 'visual') {
+    // Convert markdown to HTML for visual editing
+    var md = document.getElementById('cs-markdown').value;
+    var editor = document.getElementById('ve-editor');
+    if (typeof marked !== 'undefined' && md) {
+      editor.innerHTML = marked.parse(md);
+    } else {
+      editor.innerHTML = md ? '<p>' + md.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>') + '</p>' : '<p><br></p>';
+    }
+    injectImageStyles(editor);
+  } else {
+    // Convert HTML back to markdown
+    var html = document.getElementById('ve-editor').innerHTML;
+    document.getElementById('cs-markdown').value = htmlToMd(html);
+    updateCasePreview();
+  }
+}
+
+function onVisualEdit() {
+  // Sync visual editor content to markdown textarea (debounced)
+  clearTimeout(window._veSyncTimer);
+  window._veSyncTimer = setTimeout(function() {
+    var html = document.getElementById('ve-editor').innerHTML;
+    document.getElementById('cs-markdown').value = htmlToMd(html);
+    updateCasePreview();
+  }, 500);
+}
+
+function updateWordCount() {
+  var md = document.getElementById('cs-markdown').value || '';
+  var words = md.split(/\s+/).filter(function(w) { return w.length > 0; }).length;
+  var el = document.getElementById('ve-wordcount');
+  if (el) el.textContent = words + ' words';
+}
+
+// Toolbar commands
+function veCmd(cmd) {
+  var editor = document.getElementById('ve-editor');
+  editor.focus();
+  switch (cmd) {
+    case 'h2':
+      document.execCommand('formatBlock', false, 'h2');
+      break;
+    case 'h3':
+      document.execCommand('formatBlock', false, 'h3');
+      break;
+    case 'bold':
+      document.execCommand('bold', false, null);
+      break;
+    case 'italic':
+      document.execCommand('italic', false, null);
+      break;
+    case 'ul':
+      document.execCommand('insertUnorderedList', false, null);
+      break;
+    case 'ol':
+      document.execCommand('insertOrderedList', false, null);
+      break;
+    case 'quote':
+      document.execCommand('formatBlock', false, 'blockquote');
+      break;
+    case 'hr':
+      document.execCommand('insertHorizontalRule', false, null);
+      break;
+    case 'link':
+      var url = prompt('Enter URL:');
+      if (url) document.execCommand('createLink', false, url);
+      break;
+  }
+  onVisualEdit();
+}
+
+// Image insertion
+function showImageInsert() {
+  document.getElementById('ve-image-dialog').style.display = '';
+  veImageData = null;
+  document.getElementById('ve-img-upload-preview').innerHTML = '';
+  document.getElementById('ve-img-ai-preview').innerHTML = '';
+  updateImgPreviewSize();
+}
+
+function hideImageInsert() {
+  document.getElementById('ve-image-dialog').style.display = 'none';
+  veImageData = null;
+}
+
+function onVeImageSelected(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    veImageData = { type: 'upload', dataUrl: e.target.result, name: file.name, path: 'images/case-studies/' + file.name };
+    document.getElementById('ve-img-upload-preview').innerHTML = '<img src="' + e.target.result + '" style="max-height:120px;border-radius:4px;margin-top:0.5rem">';
+    // Also stage for upload
+    uploadedImages.push({ name: file.name, dataUrl: e.target.result, path: veImageData.path });
+    renderImageGallery();
+    renderDashboard();
+  };
+  reader.readAsDataURL(file);
+}
+
+async function generateVeImage() {
+  var prompt = document.getElementById('ve-img-ai-prompt').value.trim();
+  if (!prompt) { toast('Enter a prompt', 'error'); return; }
+  var btn = document.getElementById('ve-img-ai-btn');
+  btn.textContent = 'Generating...';
+  btn.disabled = true;
+  try {
+    var adminKey = typeof siteConfig !== 'undefined' && siteConfig.adminKey ? siteConfig.adminKey : '';
+    var res = await fetch('/api/generate-image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey },
+      body: JSON.stringify({ prompt: prompt, width: 1024, height: 576 })
+    });
+    var data = await res.json();
+    if (data.image) {
+      if (data.image.base64) {
+        var src = 'data:' + (data.image.mimeType || 'image/png') + ';base64,' + data.image.base64;
+        veImageData = { type: 'generated', dataUrl: src, name: 'ai-' + Date.now() + '.png', path: 'images/case-studies/ai-' + Date.now() + '.png' };
+        document.getElementById('ve-img-ai-preview').innerHTML = '<img src="' + src + '" style="max-height:120px;border-radius:4px;margin-top:0.5rem">';
+      } else if (data.image.url) {
+        veImageData = { type: 'url', url: data.image.url, name: 'ai-generated', path: data.image.url };
+        document.getElementById('ve-img-ai-preview').innerHTML = '<img src="' + data.image.url + '" style="max-height:120px;border-radius:4px;margin-top:0.5rem">';
+      }
+      toast('Image generated');
+    } else {
+      toast(data.error || 'Generation failed', 'error');
+    }
+  } catch (e) {
+    toast('Generation error: ' + e.message, 'error');
+  }
+  btn.textContent = 'Generate';
+  btn.disabled = false;
+}
+
+function updateImgPreviewSize() {
+  var orientation = document.getElementById('ve-img-orientation').value;
+  var box = document.getElementById('ve-img-ratio-box');
+  var label = box.querySelector('div');
+  var ratios = { landscape: [160, 90, '16:9'], portrait: [90, 160, '9:16'], square: [120, 120, '1:1'], wide: [189, 81, '21:9'], original: [160, 120, 'Original'] };
+  var r = ratios[orientation] || ratios.landscape;
+  box.style.width = r[0] + 'px';
+  box.style.height = r[1] + 'px';
+  if (label) label.textContent = r[2];
+}
+
+function insertEditorImage() {
+  var src = '';
+  if (veImageData) {
+    src = veImageData.path || veImageData.dataUrl || veImageData.url || '';
+  } else {
+    src = document.getElementById('ve-img-url-input').value.trim();
+  }
+  if (!src) { toast('No image selected', 'error'); return; }
+
+  var alt = document.getElementById('ve-img-alt').value.trim() || 'Case study image';
+  var caption = document.getElementById('ve-img-caption').value.trim();
+  var size = document.getElementById('ve-img-size').value;
+  var orientation = document.getElementById('ve-img-orientation').value;
+
+  // Build size/orientation CSS classes
+  var sizeStyle = '';
+  switch (size) {
+    case 'full': sizeStyle = 'width:100%'; break;
+    case 'large': sizeStyle = 'width:80%;margin:0 auto'; break;
+    case 'medium': sizeStyle = 'width:60%;margin:0 auto'; break;
+    case 'small': sizeStyle = 'width:40%;margin:0 auto'; break;
+    case 'inline-left': sizeStyle = 'width:40%;float:left;margin:0 1rem 1rem 0'; break;
+    case 'inline-right': sizeStyle = 'width:40%;float:right;margin:0 0 1rem 1rem'; break;
+  }
+
+  var aspectStyle = '';
+  switch (orientation) {
+    case 'landscape': aspectStyle = 'aspect-ratio:16/9;object-fit:cover'; break;
+    case 'portrait': aspectStyle = 'aspect-ratio:9/16;object-fit:cover'; break;
+    case 'square': aspectStyle = 'aspect-ratio:1/1;object-fit:cover'; break;
+    case 'wide': aspectStyle = 'aspect-ratio:21/9;object-fit:cover'; break;
+    default: aspectStyle = ''; break;
+  }
+
+  if (editorMode === 'visual') {
+    var html = '<figure style="' + sizeStyle + ';display:block;margin:1.5rem auto" contenteditable="false">';
+    html += '<img src="' + src + '" alt="' + alt + '" style="width:100%;border-radius:8px;' + aspectStyle + '" loading="lazy">';
+    if (caption) html += '<figcaption style="font-size:0.8rem;color:#888;text-align:center;margin-top:0.4rem">' + caption + '</figcaption>';
+    html += '</figure><p><br></p>';
+
+    var editor = document.getElementById('ve-editor');
+    editor.focus();
+    document.execCommand('insertHTML', false, html);
+    onVisualEdit();
+  } else {
+    // Insert as markdown
+    var md = '\n\n![' + alt + '](' + src + ')';
+    if (caption) md += '\n*' + caption + '*';
+    md += '\n\n';
+    var ta = document.getElementById('cs-markdown');
+    var pos = ta.selectionStart;
+    ta.value = ta.value.slice(0, pos) + md + ta.value.slice(pos);
+    updateCasePreview();
+  }
+
+  // Also add to case study images list
+  var imagesField = document.getElementById('cs-images');
+  if (imagesField && src && !src.startsWith('data:')) {
+    var existing = imagesField.value.trim();
+    if (!existing.includes(src)) {
+      imagesField.value = (existing ? existing + '\n' : '') + src;
+    }
+  }
+
+  hideImageInsert();
+  toast('Image inserted');
+}
+
+function injectImageStyles(editor) {
+  // Make images in the visual editor look nice
+  var imgs = editor.querySelectorAll('img');
+  imgs.forEach(function(img) {
+    img.style.maxWidth = '100%';
+    img.style.borderRadius = '8px';
+    img.style.cursor = 'pointer';
+    img.onclick = function() {
+      // Click image to resize (simple toggle)
+      if (img.style.width === '50%') {
+        img.style.width = '100%';
+      } else {
+        img.style.width = '50%';
+      }
+      onVisualEdit();
+    };
+  });
+}
+
+// HTML to Markdown converter
+function htmlToMd(html) {
+  var text = html;
+  text = text.replace(/<figure[^>]*>.*?<img[^>]*src="([^"]*)"[^>]*alt="([^"]*)"[^>]*>.*?(?:<figcaption[^>]*>(.*?)<\/figcaption>)?.*?<\/figure>/gi, function(m, src, alt, cap) {
+    var md = '\n\n![' + (alt || '') + '](' + src + ')';
+    if (cap) md += '\n*' + cap.replace(/<[^>]+>/g, '') + '*';
+    return md + '\n\n';
+  });
+  text = text.replace(/<h1[^>]*>(.*?)<\/h1>/gi, '\n# $1\n');
+  text = text.replace(/<h2[^>]*>(.*?)<\/h2>/gi, '\n## $1\n');
+  text = text.replace(/<h3[^>]*>(.*?)<\/h3>/gi, '\n### $1\n');
+  text = text.replace(/<h4[^>]*>(.*?)<\/h4>/gi, '\n#### $1\n');
+  text = text.replace(/<(strong|b)[^>]*>(.*?)<\/(strong|b)>/gi, '**$2**');
+  text = text.replace(/<(em|i)[^>]*>(.*?)<\/(em|i)>/gi, '*$2*');
+  text = text.replace(/<a[^>]+href="([^"]*)"[^>]*>(.*?)<\/a>/gi, '[$2]($1)');
+  text = text.replace(/<img[^>]+src="([^"]*)"[^>]*alt="([^"]*)"[^>]*>/gi, '\n![' + '$2' + ']($1)\n');
+  text = text.replace(/<img[^>]+src="([^"]*)"[^>]*>/gi, '\n![]($1)\n');
+  text = text.replace(/<blockquote[^>]*>(.*?)<\/blockquote>/gis, function(m, inner) {
+    return '\n> ' + inner.replace(/<[^>]+>/g, '').trim().replace(/\n/g, '\n> ') + '\n';
+  });
+  text = text.replace(/<li[^>]*>(.*?)<\/li>/gi, '\n- $1');
+  text = text.replace(/<hr[^>]*>/gi, '\n---\n');
+  text = text.replace(/<br\s*\/?>/gi, '\n');
+  text = text.replace(/<p[^>]*>(.*?)<\/p>/gi, '\n$1\n');
+  text = text.replace(/<div[^>]*>(.*?)<\/div>/gi, '\n$1');
+  text = text.replace(/<[^>]+>/g, '');
+  text = text.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&nbsp;/g, ' ').replace(/&#39;/g, "'");
+  text = text.replace(/\n{3,}/g, '\n\n');
+  return text.trim();
+}
+
+// Initialize visual editor when showing case study editor
+var origShowCaseEditor = showCaseEditor;
+showCaseEditor = function(id) {
+  origShowCaseEditor(id);
+  // Reset to visual mode and populate
+  setTimeout(function() {
+    setEditorMode('visual');
+  }, 50);
+};
 
 function getDefaultCaseTemplate() {
   return `# [Project Title]
