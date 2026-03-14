@@ -96,12 +96,14 @@
       width: 240px;
       background: var(--bg-el);
       border-right: 1px solid var(--border);
-      padding: 1.5rem 0;
+      padding: 1.5rem 0 0;
       flex-shrink: 0;
       position: sticky;
       top: 0;
       height: 100vh;
       overflow-y: auto;
+      display: flex;
+      flex-direction: column;
     }
     .sidebar__logo {
       font-weight: 600;
@@ -118,7 +120,7 @@
       font-family: var(--mono);
       letter-spacing: 0.05em;
     }
-    .sidebar__nav { list-style: none; }
+    .sidebar__nav { list-style: none; flex:1; overflow-y:auto; }
     .sidebar__section {
       font-size: 0.65rem;
       font-family: var(--mono);
@@ -517,6 +519,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         Icons
       </li>
+      <li class="sidebar__item" data-page="social-links" onclick="switchPage('social-links', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        Social Links
+      </li>
       <li class="sidebar__section">AI Assistant</li>
       <li class="sidebar__item" data-page="knowledge" onclick="switchPage('knowledge', this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
@@ -553,6 +559,13 @@
         Export Files
       </li>
     </ul>
+    <div style="padding:1.5rem;margin-top:auto;border-top:1px solid var(--border)">
+      <button class="btn btn--danger" style="width:100%;font-size:0.75rem" onclick="logout()">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </button>
+      <a href="index.html" style="display:block;text-align:center;margin-top:0.5rem;font-size:0.65rem;color:var(--text-3);text-decoration:none;font-family:var(--mono)">View live site</a>
+    </div>
   </aside>
 
   <!-- Main Content -->
@@ -962,6 +975,39 @@
           <label class="form-label">Generated SVG code</label>
           <textarea class="form-textarea" id="icon-ed-code" rows="4" readonly></textarea>
         </div>
+      </div>
+    </div>
+
+    <!-- SOCIAL LINKS -->
+    <div class="page" id="page-social-links">
+      <div class="page-header">
+        <h2>Social Links</h2>
+        <p>Manage profile URLs. These appear on the site and are accessible to the chat assistant.</p>
+      </div>
+
+      <div id="social-links-list"></div>
+
+      <div class="btn-group" style="margin-top:1rem">
+        <button class="btn" onclick="addSocialLink()">+ Add link</button>
+      </div>
+
+      <h3 style="font-size:0.9rem;margin-top:2rem;margin-bottom:0.75rem">Quick add presets</h3>
+      <div class="btn-group" style="flex-wrap:wrap">
+        <button class="btn btn--sm" onclick="addPresetLink('LinkedIn','https://linkedin.com/in/')">LinkedIn</button>
+        <button class="btn btn--sm" onclick="addPresetLink('Instagram','https://instagram.com/')">Instagram</button>
+        <button class="btn btn--sm" onclick="addPresetLink('Dribbble','https://dribbble.com/')">Dribbble</button>
+        <button class="btn btn--sm" onclick="addPresetLink('Behance','https://behance.net/')">Behance</button>
+        <button class="btn btn--sm" onclick="addPresetLink('X (Twitter)','https://x.com/')">X</button>
+        <button class="btn btn--sm" onclick="addPresetLink('Substack','https://example.substack.com')">Substack</button>
+        <button class="btn btn--sm" onclick="addPresetLink('Medium','https://medium.com/@')">Medium</button>
+        <button class="btn btn--sm" onclick="addPresetLink('Threads','https://threads.net/@')">Threads</button>
+        <button class="btn btn--sm" onclick="addPresetLink('GitHub','https://github.com/')">GitHub</button>
+        <button class="btn btn--sm" onclick="addPresetLink('Website','https://')">Website</button>
+      </div>
+
+      <div class="btn-group" style="margin-top:2rem">
+        <button class="btn btn--primary" onclick="saveSocialLinks()">Save social links</button>
+        <button class="btn" onclick="exportSocialLinks()">Download site-config.json</button>
       </div>
     </div>
 
@@ -2503,6 +2549,101 @@ function insertImageInMarkdown() {
   updateCasePreview();
   toast('Image inserted in markdown');
 }
+
+// ===== SOCIAL LINKS MANAGEMENT =====
+let socialLinksData = [];
+
+async function loadSocialLinks() {
+  try {
+    const res = await fetch('site-config.json');
+    if (res.ok) {
+      const cfg = await res.json();
+      socialLinksData = cfg.socialLinks || [];
+    }
+  } catch (e) {}
+  // Fallback defaults
+  if (socialLinksData.length === 0) {
+    socialLinksData = [
+      { label: 'LinkedIn', url: 'https://linkedin.com/in/chiranjeetbanerjee' },
+      { label: 'Instagram', url: 'https://instagram.com/broekncamera' },
+      { label: 'Substack', url: 'https://blissecode.substack.com' },
+      { label: 'Threads', url: 'https://threads.net' }
+    ];
+  }
+  renderSocialLinks();
+}
+
+function renderSocialLinks() {
+  const list = document.getElementById('social-links-list');
+  if (!list) return;
+  if (socialLinksData.length === 0) {
+    list.innerHTML = '<div class="empty-state"><p>No social links configured. Add one below or use a preset.</p></div>';
+    return;
+  }
+  list.innerHTML = socialLinksData.map(function(link, i) {
+    return '<div class="card" style="margin-bottom:0.5rem">' +
+      '<div class="form-row" style="margin-bottom:0.5rem">' +
+        '<div class="form-group" style="margin-bottom:0">' +
+          '<label class="form-label">Label</label>' +
+          '<input class="form-input" value="' + (link.label || '').replace(/"/g, '&quot;') + '" onchange="socialLinksData[' + i + '].label=this.value">' +
+        '</div>' +
+        '<div class="form-group" style="margin-bottom:0">' +
+          '<label class="form-label">URL</label>' +
+          '<input class="form-input" value="' + (link.url || '').replace(/"/g, '&quot;') + '" onchange="socialLinksData[' + i + '].url=this.value">' +
+        '</div>' +
+      '</div>' +
+      '<button class="btn btn--danger btn--sm" onclick="socialLinksData.splice(' + i + ',1);renderSocialLinks()">Remove</button>' +
+    '</div>';
+  }).join('');
+}
+
+function addSocialLink() {
+  socialLinksData.push({ label: '', url: 'https://' });
+  renderSocialLinks();
+  toast('New link added. Fill in the details.');
+}
+
+function addPresetLink(label, urlPrefix) {
+  // Check if this platform already exists
+  var exists = socialLinksData.some(function(l) { return l.label === label; });
+  if (exists) { toast(label + ' already exists', 'error'); return; }
+  socialLinksData.push({ label: label, url: urlPrefix });
+  renderSocialLinks();
+  toast(label + ' added. Update the URL with your profile.');
+}
+
+function saveSocialLinks() {
+  // Also update the knowledge base with social links
+  if (knowledgeData) {
+    knowledgeData.socialLinks = socialLinksData.map(function(l) {
+      return { label: l.label, url: l.url };
+    });
+  }
+  siteConfig.socialLinks = socialLinksData;
+  toast('Social links saved. Export site-config.json or use Deploy to publish.');
+}
+
+function exportSocialLinks() {
+  saveSocialLinks();
+  downloadFile('site-config.json', JSON.stringify(siteConfig, null, 2));
+  toast('site-config.json downloaded with social links');
+}
+
+// ===== LOGOUT =====
+function logout() {
+  document.getElementById('adminPanel').classList.remove('active');
+  document.getElementById('authGate').style.display = 'flex';
+  document.getElementById('authInput').value = '';
+  document.getElementById('authInput').focus();
+  toast('Logged out');
+}
+
+// ===== ENHANCED LOAD - add social links =====
+var origLoadManifest2 = loadManifest;
+loadManifest = async function() {
+  await origLoadManifest2();
+  await loadSocialLinks();
+};
 </script>
 </body>
 </html>

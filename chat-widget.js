@@ -242,7 +242,7 @@ Keep responses brief (2-4 sentences typical). Offer to go deeper if the visitor 
         position: fixed;
         bottom: 1.5rem;
         right: 1.5rem;
-        z-index: 150;
+        z-index: 10001;
         width: 56px;
         height: 56px;
         border-radius: 50%;
@@ -264,7 +264,7 @@ Keep responses brief (2-4 sentences typical). Offer to go deeper if the visitor 
         position: fixed;
         bottom: 5.5rem;
         right: 1.5rem;
-        z-index: 149;
+        z-index: 10000;
         width: 380px;
         max-height: 520px;
         background: #0C0C0C;
