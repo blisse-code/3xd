@@ -1299,27 +1299,54 @@
     <div class="page" id="page-insights">
       <div class="page-header">
         <h2>Visitor Insights</h2>
-        <p>What visitors are asking the AI assistant</p>
+        <p>Analytics dashboard for AI assistant interactions</p>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.75rem;margin-bottom:2rem">
+      <!-- Stats row -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:0.75rem;margin-bottom:2rem">
         <div class="card">
           <div class="card__title" style="font-size:2rem;font-weight:600;color:var(--accent)" id="vi-total">0</div>
           <div class="card__meta">Total queries</div>
         </div>
         <div class="card">
           <div class="card__title" style="font-size:2rem;font-weight:600;color:var(--accent)" id="vi-unique-days">0</div>
-          <div class="card__meta">Days with activity</div>
+          <div class="card__meta">Active days</div>
         </div>
         <div class="card">
           <div class="card__title" style="font-size:2rem;font-weight:600;color:var(--accent)" id="vi-today">0</div>
-          <div class="card__meta">Queries today</div>
+          <div class="card__meta">Today</div>
+        </div>
+        <div class="card">
+          <div class="card__title" style="font-size:2rem;font-weight:600;color:var(--accent)" id="vi-avg">0</div>
+          <div class="card__meta">Avg/day</div>
         </div>
       </div>
 
-      <h3 style="font-size:1rem;margin-bottom:0.75rem">Top Topics</h3>
-      <div id="vi-topics" style="margin-bottom:2rem"></div>
+      <!-- Word Cloud -->
+      <h3 style="font-size:1rem;margin-bottom:0.75rem">Word Cloud</h3>
+      <div id="vi-wordcloud" style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:2rem;min-height:200px;position:relative;overflow:hidden"></div>
 
+      <!-- Query Trend -->
+      <h3 style="font-size:1rem;margin-bottom:0.75rem">Query Trend (last 14 days)</h3>
+      <div id="vi-trend" style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:2rem;height:140px;position:relative"></div>
+
+      <!-- Top Intent Categories -->
+      <h3 style="font-size:1rem;margin-bottom:0.75rem">Intent Categories</h3>
+      <div id="vi-intents" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:2rem"></div>
+
+      <!-- AI Optimization Suggestions -->
+      <div style="background:var(--bg-el);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:2rem">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+          <div>
+            <h3 style="font-size:1rem;margin-bottom:0.15rem">Content Optimization Suggestions</h3>
+            <p style="font-size:0.75rem;color:var(--text-3)">AI-generated recommendations based on visitor queries</p>
+          </div>
+          <button class="btn btn--primary btn--sm" onclick="generateOptimizations()" id="vi-ai-btn">Analyze</button>
+        </div>
+        <div id="vi-suggestions"></div>
+      </div>
+
+      <!-- Recent Queries -->
       <h3 style="font-size:1rem;margin-bottom:0.75rem">Recent Queries</h3>
       <div id="vi-recent-list"></div>
 
@@ -2599,50 +2626,318 @@ function refreshInsights() {
   let logs = [];
   try { logs = JSON.parse(localStorage.getItem(VI_STORAGE_KEY) || '[]'); } catch (e) {}
 
+  // Stats
   document.getElementById('vi-total').textContent = logs.length;
-
   const days = new Set(logs.map(l => (l.t || '').slice(0, 10)));
   document.getElementById('vi-unique-days').textContent = days.size;
-
   const today = new Date().toISOString().slice(0, 10);
-  const todayCount = logs.filter(l => (l.t || '').startsWith(today)).length;
-  document.getElementById('vi-today').textContent = todayCount;
+  document.getElementById('vi-today').textContent = logs.filter(l => (l.t || '').startsWith(today)).length;
+  document.getElementById('vi-avg').textContent = days.size > 0 ? Math.round(logs.length / days.size) : 0;
 
-  // Topic extraction (simple keyword frequency)
+  // Word frequency
+  const stopWords = new Set(['what','does','is','the','a','an','about','how','can','do','i','you','me','my','his','he','for','to','of','and','in','with','on','at','or','are','was','be','this','that','it','from','have','has','will','would','could','should','not','but','if','so','than','then','as','by','we','they','their','chiranjeet','chiranjeets']);
   const wordCounts = {};
-  const stopWords = new Set(['what','does','is','the','a','an','about','how','can','do','i','you','me','my','his','he','for','to','of','and','in','with','on','at','or','are','was','be','this','that','it','from','have','has','will','would','could','should','not','but','if','so','than','then','as','by','we','they','their']);
   logs.forEach(l => {
-    const words = (l.q || '').toLowerCase().replace(/[^a-z\s]/g, '').split(/\s+/).filter(w => w.length > 2 && !stopWords.has(w));
-    words.forEach(w => { wordCounts[w] = (wordCounts[w] || 0) + 1; });
+    (l.q || '').toLowerCase().replace(/[^a-z\s]/g, '').split(/\s+/).filter(w => w.length > 2 && !stopWords.has(w))
+      .forEach(w => { wordCounts[w] = (wordCounts[w] || 0) + 1; });
   });
-  const topTopics = Object.entries(wordCounts).sort((a, b) => b[1] - a[1]).slice(0, 12);
+  const sortedWords = Object.entries(wordCounts).sort((a, b) => b[1] - a[1]);
+  const topWords = sortedWords.slice(0, 40);
 
-  const topicsEl = document.getElementById('vi-topics');
-  if (topTopics.length === 0) {
-    topicsEl.innerHTML = '<p style="font-size:0.85rem;color:var(--text-3)">No data yet. Topics will appear as visitors chat.</p>';
-  } else {
-    topicsEl.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:0.4rem">' +
-      topTopics.map(([word, count]) =>
-        '<span style="padding:0.3rem 0.7rem;background:var(--bg-el);border:1px solid var(--border);border-radius:4px;font-size:0.75rem;font-family:var(--mono);color:var(--text-2)">' + word + ' <span style="color:var(--accent)">' + count + '</span></span>'
-      ).join('') + '</div>';
-  }
+  // === WORD CLOUD (SVG) ===
+  renderWordCloud(topWords);
 
-  // Recent queries list
+  // === TREND CHART (SVG) ===
+  renderTrendChart(logs);
+
+  // === INTENT CATEGORIES ===
+  renderIntentCategories(logs);
+
+  // === RECENT QUERIES ===
   const recentEl = document.getElementById('vi-recent-list');
   const recent = logs.slice(-30).reverse();
   if (recent.length === 0) {
     recentEl.innerHTML = '<div class="empty-state"><p>No visitor queries logged yet.</p></div>';
   } else {
-    recentEl.innerHTML = recent.map(l => `
-      <div class="card" style="padding:0.75rem 1rem;margin-bottom:0.4rem">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem">
-          <div style="font-size:0.85rem;color:var(--text)">${escapeHtml(l.q || '')}</div>
-          <div style="font-size:0.65rem;color:var(--text-3);font-family:var(--mono);white-space:nowrap">${formatTime(l.t)}</div>
-        </div>
-        ${l.s && l.s !== 'direct' ? '<div style="font-size:0.65rem;color:var(--text-3);margin-top:0.25rem">via: ' + escapeHtml(l.s) + '</div>' : ''}
-      </div>
-    `).join('');
+    recentEl.innerHTML = recent.map(l =>
+      '<div class="card" style="padding:0.6rem 1rem;margin-bottom:0.3rem">' +
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem">' +
+          '<div style="font-size:0.82rem;color:var(--text)">' + escapeHtml(l.q || '') + '</div>' +
+          '<div style="font-size:0.6rem;color:var(--text-3);font-family:var(--mono);white-space:nowrap">' + formatTime(l.t) + '</div>' +
+        '</div>' +
+      '</div>'
+    ).join('');
   }
+}
+
+function renderWordCloud(words) {
+  const container = document.getElementById('vi-wordcloud');
+  if (!words || words.length === 0) {
+    container.innerHTML = '<p style="text-align:center;color:var(--text-3);font-size:0.85rem;padding:2rem">No data yet. The word cloud populates as visitors interact with the chat assistant.</p>';
+    return;
+  }
+
+  const maxCount = words[0][1];
+  const minCount = words[words.length - 1][1];
+  const W = container.clientWidth || 600;
+  const H = 220;
+
+  // Generate word positions using a spiral layout
+  var placed = [];
+  var svgWords = '';
+  var colors = ['#C9A84C', '#DFC06A', '#B5AFA6', '#9B8ECC', '#6BCC8E', '#CC8E9B', '#807A72', '#E8E2D9'];
+
+  words.forEach(function(entry, i) {
+    var word = entry[0];
+    var count = entry[1];
+    var t = (count - minCount) / (maxCount - minCount || 1);
+    var fontSize = Math.round(11 + t * 28);
+    var color = colors[i % colors.length];
+
+    // Spiral placement
+    var angle = i * 0.75;
+    var radius = 10 + i * 6;
+    var cx = W / 2 + Math.cos(angle) * radius * (W / 600);
+    var cy = H / 2 + Math.sin(angle) * radius * 0.5;
+
+    // Clamp to bounds
+    var estWidth = word.length * fontSize * 0.55;
+    cx = Math.max(estWidth / 2 + 5, Math.min(W - estWidth / 2 - 5, cx));
+    cy = Math.max(fontSize, Math.min(H - 5, cy));
+
+    var opacity = 0.5 + t * 0.5;
+    var weight = t > 0.6 ? 600 : t > 0.3 ? 500 : 400;
+
+    svgWords += '<text x="' + Math.round(cx) + '" y="' + Math.round(cy) + '" ' +
+      'font-size="' + fontSize + '" fill="' + color + '" opacity="' + opacity.toFixed(2) + '" ' +
+      'font-weight="' + weight + '" text-anchor="middle" font-family="\'DM Sans\',sans-serif" ' +
+      'style="cursor:default" title="' + word + ': ' + count + '">' +
+      '<title>' + word + ': ' + count + ' mentions</title>' +
+      word + '</text>';
+  });
+
+  container.innerHTML = '<svg width="100%" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg">' + svgWords + '</svg>';
+}
+
+function renderTrendChart(logs) {
+  var container = document.getElementById('vi-trend');
+  if (!logs || logs.length === 0) {
+    container.innerHTML = '<p style="text-align:center;color:var(--text-3);font-size:0.8rem;padding:2rem">No data yet</p>';
+    return;
+  }
+
+  // Count queries per day for last 14 days
+  var dayCounts = {};
+  var now = new Date();
+  for (var d = 13; d >= 0; d--) {
+    var date = new Date(now);
+    date.setDate(date.getDate() - d);
+    dayCounts[date.toISOString().slice(0, 10)] = 0;
+  }
+  logs.forEach(function(l) {
+    var day = (l.t || '').slice(0, 10);
+    if (day in dayCounts) dayCounts[day]++;
+  });
+
+  var dayEntries = Object.entries(dayCounts);
+  var maxVal = Math.max.apply(null, dayEntries.map(function(e) { return e[1]; })) || 1;
+  var W = container.clientWidth || 600;
+  var H = 120;
+  var padL = 30, padR = 10, padT = 10, padB = 25;
+  var chartW = W - padL - padR;
+  var chartH = H - padT - padB;
+
+  var points = dayEntries.map(function(entry, i) {
+    var x = padL + (i / (dayEntries.length - 1 || 1)) * chartW;
+    var y = padT + chartH - (entry[1] / maxVal) * chartH;
+    return { x: Math.round(x), y: Math.round(y), val: entry[1], label: entry[0].slice(5) };
+  });
+
+  // Build path
+  var linePath = points.map(function(p, i) { return (i === 0 ? 'M' : 'L') + p.x + ',' + p.y; }).join(' ');
+  var areaPath = linePath + ' L' + points[points.length - 1].x + ',' + (padT + chartH) + ' L' + points[0].x + ',' + (padT + chartH) + ' Z';
+
+  var svg = '<svg width="100%" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg">';
+
+  // Y-axis labels
+  svg += '<text x="' + (padL - 5) + '" y="' + (padT + 4) + '" font-size="9" fill="#807A72" text-anchor="end" font-family="\'JetBrains Mono\',monospace">' + maxVal + '</text>';
+  svg += '<text x="' + (padL - 5) + '" y="' + (padT + chartH + 4) + '" font-size="9" fill="#807A72" text-anchor="end" font-family="\'JetBrains Mono\',monospace">0</text>';
+
+  // Grid lines
+  svg += '<line x1="' + padL + '" y1="' + padT + '" x2="' + (padL + chartW) + '" y2="' + padT + '" stroke="#2A2A2A" stroke-dasharray="3,3"/>';
+  svg += '<line x1="' + padL + '" y1="' + (padT + chartH) + '" x2="' + (padL + chartW) + '" y2="' + (padT + chartH) + '" stroke="#2A2A2A"/>';
+
+  // Area fill
+  svg += '<path d="' + areaPath + '" fill="rgba(201,168,76,0.08)"/>';
+
+  // Line
+  svg += '<path d="' + linePath + '" fill="none" stroke="#C9A84C" stroke-width="2" stroke-linejoin="round"/>';
+
+  // Dots and x-labels (every other day)
+  points.forEach(function(p, i) {
+    svg += '<circle cx="' + p.x + '" cy="' + p.y + '" r="3" fill="#C9A84C"><title>' + p.label + ': ' + p.val + '</title></circle>';
+    if (i % 2 === 0 || i === points.length - 1) {
+      svg += '<text x="' + p.x + '" y="' + (padT + chartH + 15) + '" font-size="8" fill="#807A72" text-anchor="middle" font-family="\'JetBrains Mono\',monospace">' + p.label + '</text>';
+    }
+  });
+
+  svg += '</svg>';
+  container.innerHTML = svg;
+}
+
+function renderIntentCategories(logs) {
+  var container = document.getElementById('vi-intents');
+  if (!logs || logs.length === 0) {
+    container.innerHTML = '<p style="font-size:0.8rem;color:var(--text-3);grid-column:1/-1">No data yet</p>';
+    return;
+  }
+
+  // Classify queries into intent buckets
+  var intents = {
+    'Expertise & Skills': { keywords: ['skill','expert','speciali','know','tool','method','figma','ux','ai','design','research'], count: 0, color: '#6BCC8E' },
+    'Availability & Hiring': { keywords: ['avail','hire','freelance','project','work with','open','busy','book','meet'], count: 0, color: '#C9A84C' },
+    'Services & Pricing': { keywords: ['service','price','cost','audit','consult','workshop','offer','rate','package'], count: 0, color: '#9B8ECC' },
+    'Background & Experience': { keywords: ['experience','background','year','compan','portfolio','career','role','history'], count: 0, color: '#CC8E9B' },
+    'Job Fit Check': { keywords: ['fit','job','role','position','requirement','candidate','match','qualif'], count: 0, color: '#DFC06A' },
+    'Articles & Writing': { keywords: ['article','writ','blog','substack','publish','read','thought','post'], count: 0, color: '#B5AFA6' }
+  };
+
+  logs.forEach(function(l) {
+    var q = (l.q || '').toLowerCase();
+    for (var cat in intents) {
+      if (intents[cat].keywords.some(function(kw) { return q.includes(kw); })) {
+        intents[cat].count++;
+      }
+    }
+  });
+
+  var total = logs.length || 1;
+  var html = '';
+  for (var cat in intents) {
+    var pct = Math.round((intents[cat].count / total) * 100);
+    html += '<div class="card" style="padding:0.75rem 1rem">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem">' +
+        '<span style="font-size:0.8rem;font-weight:500;color:var(--text)">' + cat + '</span>' +
+        '<span style="font-size:0.75rem;font-family:var(--mono);color:' + intents[cat].color + '">' + intents[cat].count + ' (' + pct + '%)</span>' +
+      '</div>' +
+      '<div style="height:4px;background:var(--bg);border-radius:2px;overflow:hidden">' +
+        '<div style="height:100%;width:' + pct + '%;background:' + intents[cat].color + ';border-radius:2px;transition:width 0.5s"></div>' +
+      '</div>' +
+    '</div>';
+  }
+  container.innerHTML = html;
+}
+
+// === AI CONTENT OPTIMIZATION ENGINE ===
+async function generateOptimizations() {
+  var logs = [];
+  try { logs = JSON.parse(localStorage.getItem(VI_STORAGE_KEY) || '[]'); } catch (e) {}
+
+  if (logs.length < 3) {
+    toast('Need at least 3 visitor queries to generate suggestions', 'error');
+    return;
+  }
+
+  var btn = document.getElementById('vi-ai-btn');
+  var suggestionsEl = document.getElementById('vi-suggestions');
+  btn.textContent = 'Analyzing...';
+  btn.disabled = true;
+  suggestionsEl.innerHTML = '<div class="loader"><span class="loader__dot"></span><span class="loader__dot"></span><span class="loader__dot"></span>Analyzing patterns...</div>';
+
+  // Build summary for AI
+  var querySummary = logs.slice(-50).map(function(l) { return l.q; }).join('\n');
+  var wordCounts = {};
+  var stopWords = new Set(['what','does','is','the','a','an','about','how','can','do','i','you','me','my','his','he','for','to','of','and','in','with','on','at','or','are','was','be','this','that','it','from','have','has','will','would','could','should','not','but','if','so','than','then','as','by','we','they','their','chiranjeet']);
+  logs.forEach(function(l) {
+    (l.q || '').toLowerCase().replace(/[^a-z\s]/g, '').split(/\s+/).filter(function(w) { return w.length > 2 && !stopWords.has(w); })
+      .forEach(function(w) { wordCounts[w] = (wordCounts[w] || 0) + 1; });
+  });
+  var topKeywords = Object.entries(wordCounts).sort(function(a, b) { return b[1] - a[1]; }).slice(0, 15).map(function(e) { return e[0] + '(' + e[1] + ')'; }).join(', ');
+
+  try {
+    var res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system: 'You are a portfolio optimization advisor. Analyze visitor queries to a designer portfolio chat assistant and suggest specific content changes. Return exactly 5 suggestions in this format for each:\n\nSUGGESTION: [title]\nSECTION: [which page section to update: hero/about/services/case-studies/articles/knowledge-base]\nACTION: [add/edit/remove/rewrite]\nDETAIL: [specific change with exact wording where possible]\nIMPACT: [what this improves: visibility/conversion/trust/clarity]\n\nBe specific. Reference actual visitor queries. Focus on making the profile strongest for roles visitors are asking about.',
+        messages: [{
+          role: 'user',
+          content: 'Here are the last 50 visitor queries to Chiranjeet Banerjee\'s portfolio chat:\n\n' + querySummary + '\n\nTop keywords: ' + topKeywords + '\n\nTotal queries: ' + logs.length + '\n\nProvide 5 specific content optimization suggestions.'
+        }]
+      })
+    });
+
+    var data = await res.json();
+    var text = '';
+    if (data.content) {
+      text = data.content.filter(function(b) { return b.type === 'text'; }).map(function(b) { return b.text; }).join('');
+    }
+
+    if (!text) {
+      suggestionsEl.innerHTML = '<p style="color:var(--text-3);font-size:0.85rem">Could not generate suggestions. Check API configuration.</p>';
+      btn.textContent = 'Analyze';
+      btn.disabled = false;
+      return;
+    }
+
+    // Parse suggestions
+    var suggestions = text.split(/SUGGESTION:\s*/i).filter(function(s) { return s.trim(); });
+    var approvedKey = 'cb_approved_suggestions';
+    var approved = [];
+    try { approved = JSON.parse(localStorage.getItem(approvedKey) || '[]'); } catch(e) {}
+
+    suggestionsEl.innerHTML = suggestions.map(function(s, i) {
+      var lines = s.trim().split('\n');
+      var title = lines[0] || 'Suggestion ' + (i + 1);
+      var section = '', action = '', detail = '', impact = '';
+      lines.forEach(function(line) {
+        if (line.match(/^SECTION:/i)) section = line.replace(/^SECTION:\s*/i, '');
+        if (line.match(/^ACTION:/i)) action = line.replace(/^ACTION:\s*/i, '');
+        if (line.match(/^DETAIL:/i)) detail = line.replace(/^DETAIL:\s*/i, '');
+        if (line.match(/^IMPACT:/i)) impact = line.replace(/^IMPACT:\s*/i, '');
+      });
+
+      var id = 'sug-' + i;
+      var isApproved = approved.indexOf(id) >= 0;
+
+      return '<div class="card" style="margin-bottom:0.5rem;border-left:3px solid ' + (isApproved ? 'var(--success)' : 'var(--accent)') + '">' +
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.5rem">' +
+          '<div style="font-size:0.9rem;font-weight:500;color:var(--text)">' + escapeHtml(title) + '</div>' +
+          '<div style="display:flex;gap:0.3rem">' +
+            (isApproved
+              ? '<span style="font-size:0.65rem;color:var(--success);font-family:var(--mono);padding:0.2rem 0.5rem;border:1px solid var(--success);border-radius:3px">APPROVED</span>'
+              : '<button class="btn btn--sm" style="font-size:0.65rem;padding:0.2rem 0.5rem" onclick="approveSuggestion(\'' + id + '\',this)">Approve</button>' +
+                '<button class="btn btn--sm" style="font-size:0.65rem;padding:0.2rem 0.5rem;color:var(--text-3)" onclick="this.closest(\'.card\').remove()">Dismiss</button>'
+            ) +
+          '</div>' +
+        '</div>' +
+        (section ? '<div style="font-size:0.7rem;margin-bottom:0.3rem"><span style="color:var(--text-3);font-family:var(--mono)">SECTION:</span> <span style="color:var(--accent)">' + escapeHtml(section) + '</span></div>' : '') +
+        (action ? '<div style="font-size:0.7rem;margin-bottom:0.3rem"><span style="color:var(--text-3);font-family:var(--mono)">ACTION:</span> ' + escapeHtml(action) + '</div>' : '') +
+        (detail ? '<div style="font-size:0.82rem;color:var(--text-2);margin-bottom:0.3rem;line-height:1.5">' + escapeHtml(detail) + '</div>' : '') +
+        (impact ? '<div style="font-size:0.7rem;color:var(--text-3);font-family:var(--mono)">IMPACT: ' + escapeHtml(impact) + '</div>' : '') +
+      '</div>';
+    }).join('');
+
+  } catch (e) {
+    suggestionsEl.innerHTML = '<p style="color:var(--danger);font-size:0.85rem">Analysis failed: ' + escapeHtml(e.message) + '</p>';
+  }
+
+  btn.textContent = 'Analyze';
+  btn.disabled = false;
+}
+
+function approveSuggestion(id, btn) {
+  var approvedKey = 'cb_approved_suggestions';
+  var approved = [];
+  try { approved = JSON.parse(localStorage.getItem(approvedKey) || '[]'); } catch(e) {}
+  if (approved.indexOf(id) < 0) approved.push(id);
+  localStorage.setItem(approvedKey, JSON.stringify(approved));
+
+  var card = btn.closest('.card');
+  card.style.borderLeftColor = 'var(--success, #4a9)';
+  var btnGroup = btn.parentElement;
+  btnGroup.innerHTML = '<span style="font-size:0.65rem;color:var(--success);font-family:var(--mono);padding:0.2rem 0.5rem;border:1px solid var(--success);border-radius:3px">APPROVED</span>';
+  toast('Suggestion approved');
 }
 
 function clearInsights() {
