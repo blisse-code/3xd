@@ -1397,6 +1397,52 @@
           <button class="btn btn--sm" onclick="switchPage('gdocs-import',document.querySelector('[data-page=gdocs-import]'))">Open importer</button>
         </div>
       </div>
+
+      <div class="integration-card">
+        <div class="integration-icon" style="color:var(--accent)">C</div>
+        <div class="integration-info">
+          <h4>Calendly</h4>
+          <p>Embed Calendly directly in the portfolio. Visitors click "Book a meeting" and see a popup scheduler instead of leaving the site.</p>
+          <div class="form-group" style="margin-bottom:0.5rem">
+            <label class="form-label">Calendly scheduling URL</label>
+            <input class="form-input" id="int-calendly-url" placeholder="https://calendly.com/meetchiranjeet/30min" value="https://calendly.com/meetchiranjeet/30min">
+            <div class="form-help">Your Calendly event link. The popup widget loads automatically when this is set.</div>
+          </div>
+          <button class="btn btn--sm btn--primary" onclick="saveCalendlyConfig()">Save</button>
+        </div>
+      </div>
+
+      <div class="integration-card">
+        <div class="integration-icon" style="color:#4285F4">GC</div>
+        <div class="integration-info">
+          <h4>Google Calendar (live availability)</h4>
+          <p>Automatically check if you are currently free or busy. The chat assistant will say "available" or "not available" based on your actual calendar, without revealing what you are doing.</p>
+          <div class="form-group" style="margin-bottom:0.5rem">
+            <label class="form-label">Google Calendar ID</label>
+            <input class="form-input" id="int-gcal-id" placeholder="your-email@gmail.com or calendar ID">
+            <div class="form-help">Usually your Gmail address. Must be shared publicly (free/busy only).</div>
+          </div>
+          <div class="form-group" style="margin-bottom:0.5rem">
+            <label class="form-label">Google API Key</label>
+            <input class="form-input" id="int-gcal-key" placeholder="AIza...">
+            <div class="form-help">Create at console.cloud.google.com with Calendar API enabled.</div>
+          </div>
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:0.75rem;margin-bottom:0.75rem;font-size:0.75rem;color:var(--text-3)">
+            <strong style="color:var(--text-2)">Setup steps:</strong><br>
+            1. Go to console.cloud.google.com<br>
+            2. Enable "Google Calendar API"<br>
+            3. Create an API Key (Credentials tab)<br>
+            4. In Google Calendar settings, share your calendar with "See only free/busy" visibility<br>
+            5. Paste the calendar ID and API key above<br>
+            6. Set these as Vercel env vars: GOOGLE_CALENDAR_ID, GOOGLE_CALENDAR_KEY
+          </div>
+          <div class="btn-group">
+            <button class="btn btn--sm btn--primary" onclick="saveGCalConfig()">Save</button>
+            <button class="btn btn--sm" onclick="testGCalConnection()">Test connection</button>
+          </div>
+          <div id="int-gcal-status" style="margin-top:0.5rem;font-size:0.8rem"></div>
+        </div>
+      </div>
     </div>
 
     <!-- GOOGLE DOCS IMPORT -->
@@ -2952,6 +2998,45 @@ function exportInsights() {
   try { logs = JSON.parse(localStorage.getItem(VI_STORAGE_KEY) || '[]'); } catch (e) {}
   downloadFile('visitor-insights.json', JSON.stringify(logs, null, 2));
   toast('Insights exported');
+}
+
+// ===== CALENDAR INTEGRATIONS =====
+function saveCalendlyConfig() {
+  var url = document.getElementById('int-calendly-url').value.trim();
+  if (!url) { toast('Enter a Calendly URL', 'error'); return; }
+  // Save to site-config
+  if (typeof siteConfig !== 'undefined') {
+    siteConfig.calendlyUrl = url;
+  }
+  toast('Calendly URL saved. Deploy to apply.');
+}
+
+function saveGCalConfig() {
+  var calId = document.getElementById('int-gcal-id').value.trim();
+  var apiKey = document.getElementById('int-gcal-key').value.trim();
+  if (!calId || !apiKey) { toast('Both Calendar ID and API Key are required', 'error'); return; }
+  toast('Google Calendar config saved. Add GOOGLE_CALENDAR_ID and GOOGLE_CALENDAR_KEY as Vercel env vars, then redeploy.');
+}
+
+async function testGCalConnection() {
+  var statusEl = document.getElementById('int-gcal-status');
+  statusEl.innerHTML = '<span style="color:var(--text-3)">Testing...</span>';
+  try {
+    var res = await fetch('/api/availability');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    var data = await res.json();
+    if (data.source === 'google-calendar') {
+      statusEl.innerHTML = '<span style="color:var(--success)">' +
+        (data.available ? '&#10003; Connected. Status: Available' : '&#10003; Connected. Status: Busy') +
+        '</span>';
+    } else if (data.source === 'manual') {
+      statusEl.innerHTML = '<span style="color:var(--text-3)">Calendar not configured on server. Using manual availability. Add env vars and redeploy.</span>';
+    } else {
+      statusEl.innerHTML = '<span style="color:var(--danger)">Connection issue: ' + (data.note || 'unknown') + '</span>';
+    }
+  } catch (e) {
+    statusEl.innerHTML = '<span style="color:var(--danger)">Test failed: ' + e.message + '</span>';
+  }
 }
 
 function escapeHtml(text) {

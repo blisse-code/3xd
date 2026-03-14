@@ -978,5 +978,33 @@
   </script>
   <!-- AI Chat Assistant -->
   <script src="chat-widget.js" defer></script>
+  <!-- Ambient Music (72 BPM) -->
+  <script src="ambient-music.js" defer></script>
+  <!-- Calendly inline embed (loaded when site-config has calendlyUrl) -->
+  <script>
+    (function(){
+      fetch('site-config.json').then(function(r){return r.ok?r.json():null}).then(function(cfg){
+        if(!cfg||!cfg.calendlyUrl)return;
+        // Add Calendly popup widget script
+        var s=document.createElement('script');
+        s.src='https://assets.calendly.com/assets/external/widget.js';
+        s.async=true;
+        document.head.appendChild(s);
+        // Make booking buttons open Calendly popup
+        s.onload=function(){
+          document.querySelectorAll('a[href*="calendly.com"]').forEach(function(a){
+            a.addEventListener('click',function(e){
+              e.preventDefault();
+              if(window.Calendly){
+                Calendly.initPopupWidget({url:cfg.calendlyUrl});
+              }else{
+                window.open(cfg.calendlyUrl,'_blank');
+              }
+            });
+          });
+        };
+      }).catch(function(){});
+    })();
+  </script>
 </body>
 </html>

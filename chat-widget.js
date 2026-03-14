@@ -22,6 +22,8 @@
   let isLoading = false;
 
   // ===== LOAD KNOWLEDGE BASE =====
+  let liveAvailability = null;
+
   async function loadKnowledge() {
     try {
       const [kRes, aRes] = await Promise.all([
@@ -33,6 +35,11 @@
     } catch (e) {
       console.warn('Chat: Could not load knowledge base');
     }
+    // Check live calendar (non-blocking)
+    try {
+      var calRes = await fetch('/api/availability');
+      if (calRes.ok) liveAvailability = await calRes.json();
+    } catch (e) { /* Calendar not configured */ }
   }
 
   // ===== BUILD SYSTEM PROMPT =====
@@ -44,11 +51,19 @@
     const bc = brands.blisseCode || {};
     const bk = brands.broeknCamera || {};
 
-    const availStatus = a.currentStatus === 'available'
-      ? `Chiranjeet is currently available for select projects. ${a.statusNote || ''}`
-      : a.currentStatus === 'busy'
-        ? `Chiranjeet is not available right now. ${a.statusNote || ''}`
-        : `Availability is not confirmed. Suggest booking a call.`;
+    // Combine manual availability with live calendar
+    var availStatus = '';
+    if (liveAvailability && liveAvailability.source === 'google-calendar') {
+      availStatus = liveAvailability.available
+        ? 'Chiranjeet is currently available. ' + (a.statusNote || '')
+        : 'Chiranjeet is not available right now. ' + (a.statusNote || '');
+    } else {
+      availStatus = a.currentStatus === 'available'
+        ? 'Chiranjeet is currently available for select projects. ' + (a.statusNote || '')
+        : a.currentStatus === 'busy'
+          ? 'Chiranjeet is not available right now. ' + (a.statusNote || '')
+          : 'Availability is not confirmed. Suggest booking a call.';
+    }
 
     const faqBlock = (k.faq || []).map(f => `Q: ${f.q}\nA: ${f.a}`).join('\n\n');
     const customFacts = (k.customFacts || []).map(f => `- ${f}`).join('\n');

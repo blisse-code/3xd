@@ -3,6 +3,7 @@
   "resumeUrl": "",
   "logoPath": "",
   "faviconPath": "icons/favicon.png",
+  "calendlyUrl": "https://calendly.com/meetchiranjeet/30min",
   "socialLinks": [
     { "label": "LinkedIn", "url": "https://linkedin.com/in/chiranjeetbanerjee" },
     { "label": "Instagram", "url": "https://instagram.com/broekncamera" },
