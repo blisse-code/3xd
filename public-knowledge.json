@@ -87,7 +87,10 @@
   "contact": {
     "booking": "https://calendly.com/meetchiranjeet/30min",
     "email": "be.chiranjeet@outlook.com",
-    "linkedin": "https://linkedin.com/in/chiranjeetbanerjee"
+    "linkedin": "https://linkedin.com/in/chiranjeet",
+    "resume": "https://onedrive.live.com/?redeem=aHR0cHM6Ly8xZHJ2Lm1zL2IvcyFBcEZ6d2VrNm1oYzktRWRDSDRUdUNIVkdaZnNUP2U9V2FERThn&cid=3D179A3AE9C17391&id=3D179A3AE9C17391%2115431&parId=3D179A3AE9C17391%215926&o=OneUp",
+    "portfolio": "https://3xd-chi.vercel.app",
+    "designlab": "https://app.designlab.com/alphatattva/"
   },
   "faq": [
     {
@@ -116,10 +119,30 @@
     }
   ],
   "socialLinks": [
-    { "label": "LinkedIn", "url": "https://linkedin.com/in/chiranjeetbanerjee" },
-    { "label": "Instagram", "url": "https://instagram.com/broekncamera" },
-    { "label": "Substack", "url": "https://blissecode.substack.com" },
-    { "label": "Threads", "url": "https://threads.net" }
+    {
+      "label": "LinkedIn",
+      "url": "https://linkedin.com/in/chiranjeet"
+    },
+    {
+      "label": "Instagram",
+      "url": "https://instagram.com/broekncamera"
+    },
+    {
+      "label": "Substack",
+      "url": "https://blissecode.substack.com"
+    },
+    {
+      "label": "Threads",
+      "url": "https://threads.net"
+    },
+    {
+      "label": "Dribbble",
+      "url": "https://dribbble.com/blissecode"
+    },
+    {
+      "label": "Behance",
+      "url": "https://behance.net/blissecode"
+    }
   ],
   "articles": [
     {
@@ -173,5 +196,31 @@
       "Is the work premium, selective, and quality-focused?"
     ]
   },
-  "customFacts": []
+  "customFacts": [],
+  "testimonials": [
+    {
+      "name": "Kathy C",
+      "role": "UX Academy Student",
+      "source": "Designlab",
+      "text": "Chiranjeet embodies kindness and patience, creating a safe and comfortable environment where you can freely ask questions about UX and even providing mental support for managing stress and time effectively. He goes beyond being a UX mentor and extends his guidance to personal growth as well."
+    },
+    {
+      "name": "Emilie C",
+      "role": "UX Academy Student",
+      "source": "Designlab",
+      "text": "Chiranjeet would go above and beyond to help me become successful in UX design. With his feedback, I was able to grow my skill set quickly, and was able to achieve a job at Citi as a UX designer, during my schooling! He would get a 10 out of 5 star rating for me!"
+    },
+    {
+      "name": "Jessica Y",
+      "role": "UX Academy Student",
+      "source": "Designlab",
+      "text": "Chiranjeet was very helpful throughout my early journey at UX Academy. He always provided advice to mitigate my worries as well as provided clarification on approaching certain steps in design whenever I needed it."
+    },
+    {
+      "name": "Urisa P",
+      "role": "UX Academy Foundations Student",
+      "source": "Designlab",
+      "text": "Being new to my design journey, I felt a lot of imposter syndrome, but Chiranjeet was easy to talk to and provided much objective, precise, and consistent feedback that helped me navigate this course. He is very knowledgeable in this field and provided invaluable insight into the industry."
+    }
+  ]
 }

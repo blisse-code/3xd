@@ -137,7 +137,10 @@ ${articlesBlock || 'None configured'}
 CONTACT:
 - Book a call: [Book a 30-min call](${(k.contact || {}).booking || 'https://calendly.com/meetchiranjeet/30min'})
 - Email: [${(k.contact || {}).email || 'be.chiranjeet@outlook.com'}](mailto:${(k.contact || {}).email || 'be.chiranjeet@outlook.com'})
-- LinkedIn: [LinkedIn Profile](${(k.contact || {}).linkedin || 'https://linkedin.com/in/chiranjeetbanerjee'})
+- LinkedIn: [LinkedIn Profile](${(k.contact || {}).linkedin || 'https://linkedin.com/in/chiranjeet'})
+- Resume: [View Resume](${(k.contact || {}).resume || 'https://onedrive.live.com/?redeem=aHR0cHM6Ly8xZHJ2Lm1zL2IvcyFBcEZ6d2VrNm1oYzktRWRDSDRUdUNIVkdaZnNUP2U9V2FERThn&cid=3D179A3AE9C17391&id=3D179A3AE9C17391%2115431&parId=3D179A3AE9C17391%215926&o=OneUp'})
+- Portfolio: [View Portfolio](${(k.contact || {}).portfolio || 'https://3xd-chi.vercel.app'})
+- Designlab Mentor Profile: [Designlab](${(k.contact || {}).designlab || 'https://app.designlab.com/alphatattva/'})
 
 FREQUENTLY ASKED:
 ${faqBlock}
@@ -552,6 +555,9 @@ Keep responses brief (2-4 sentences typical). Offer to go deeper if the visitor 
       panel.classList.toggle('open', isOpen);
       if (isOpen) {
         setTimeout(() => input.focus(), 300);
+        if (window.SoundFX) window.SoundFX.chatOpen();
+      } else {
+        if (window.SoundFX) window.SoundFX.chatClose();
       }
     });
 
@@ -586,6 +592,7 @@ Keep responses brief (2-4 sentences typical). Offer to go deeper if the visitor 
 
       // Add user message
       appendMessage(text, 'user');
+      if (window.SoundFX) window.SoundFX.messageSend();
 
       // Show typing indicator
       isLoading = true;
@@ -606,6 +613,7 @@ Keep responses brief (2-4 sentences typical). Offer to go deeper if the visitor 
 
       if (reply) {
         appendMessage(reply, 'assistant');
+        if (window.SoundFX) window.SoundFX.messageReceive();
       }
 
       input.focus();

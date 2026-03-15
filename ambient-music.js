@@ -248,7 +248,7 @@
     style.textContent = [
       '.amb-toggle{position:fixed;bottom:1.5rem;left:1.5rem;z-index:10001;width:40px;height:40px;border-radius:50%;',
       'background:var(--c-bg-elevated,#141414);border:1px solid var(--c-border,#2A2A2A);cursor:pointer;',
-      'display:flex;align-items:center;justify-content:center;transition:all 200ms;opacity:0.5}',
+      'display:none;align-items:center;justify-content:center;transition:all 200ms;opacity:0.5}',
       '.amb-toggle:hover{opacity:0.9;border-color:var(--c-accent,#C9A84C)}',
       '.amb-toggle.playing{opacity:0.8;border-color:var(--c-accent,#C9A84C)}',
       '.amb-toggle.playing .amb-bars span{animation:amb-bar 0.8s ease-in-out infinite alternate}',

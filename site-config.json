@@ -5,9 +5,29 @@
   "faviconPath": "icons/favicon.png",
   "calendlyUrl": "https://calendly.com/meetchiranjeet/30min",
   "socialLinks": [
-    { "label": "LinkedIn", "url": "https://linkedin.com/in/chiranjeetbanerjee" },
-    { "label": "Instagram", "url": "https://instagram.com/broekncamera" },
-    { "label": "Substack", "url": "https://blissecode.substack.com" },
-    { "label": "Threads", "url": "https://threads.net" }
+    {
+      "label": "LinkedIn",
+      "url": "https://linkedin.com/in/chiranjeet"
+    },
+    {
+      "label": "Instagram",
+      "url": "https://instagram.com/broekncamera"
+    },
+    {
+      "label": "Substack",
+      "url": "https://blissecode.substack.com"
+    },
+    {
+      "label": "Threads",
+      "url": "https://threads.net"
+    },
+    {
+      "label": "Dribbble",
+      "url": "https://dribbble.com/blissecode"
+    },
+    {
+      "label": "Behance",
+      "url": "https://behance.net/blissecode"
+    }
   ]
 }
