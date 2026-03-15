@@ -35,18 +35,18 @@
     }
   ],
   "backgroundMusic": {
-    "mode": "generative",
+    "mode": "tracks",
     "tracks": [
       {
-        "url": "https://open.spotify.com/track/2UZZtkoLOg7IHxeTAdPFvd?si=d78af53fdb6b4e8a",
-        "title": "User's Spotify track"
+        "url": "https://open.spotify.com/track/0pqnGHJpmpxLKifKRmU6WP?si=d3ba0f64b759411e",
+        "title": "Believer-ID"
       }
     ],
-    "volume": 0.7,
+    "volume": 0.5,
     "autoplay": true
   },
   "particles": {
-    "preset": "aurora",
+    "preset": "connections",
     "density": 3
   }
 }
