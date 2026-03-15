@@ -14,104 +14,111 @@
 
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  // ===== 1. PARTICLE BACKGROUND (MagicUI particles style) =====
+  // ===== 1. PARTICLE BACKGROUND (configurable presets + density) =====
   function initParticles() {
+    fetch('site-config.json').then(function(r){return r.ok?r.json():null}).then(function(cfg) {
+      var pc = (cfg && cfg.particles) || { preset: 'connections', density: 3 };
+      buildParticles(pc.preset || 'connections', pc.density || 3);
+    }).catch(function() { buildParticles('connections', 3); });
+  }
+
+  function buildParticles(preset, density) {
     var canvas = document.createElement('canvas');
     canvas.id = 'particles-bg';
-    canvas.style.cssText = 'position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:0.4';
+    canvas.style.cssText = 'position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:0.5';
     document.body.prepend(canvas);
 
     var ctx = canvas.getContext('2d');
     var particles = [];
     var mouse = { x: -1000, y: -1000 };
-    var PARTICLE_COUNT = Math.min(60, Math.floor(window.innerWidth / 20));
-    var CONNECTION_DIST = 120;
+    var BASE_COUNT = [20, 40, 60, 90, 120];
+    var PARTICLE_COUNT = Math.min(BASE_COUNT[density - 1] || 60, Math.floor(window.innerWidth / 12));
+    var CONNECTION_DIST = 100 + density * 15;
 
-    function resize() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     resize();
     window.addEventListener('resize', debounce(resize, 200));
+    document.addEventListener('mousemove', function(e) { mouse.x = e.clientX; mouse.y = e.clientY; }, { passive: true });
 
-    document.addEventListener('mousemove', function(e) {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-    }, { passive: true });
+    var accentHex = getComputedStyle(document.documentElement).getPropertyValue('--c-accent').trim() || '#C9A84C';
+    function hexRgb(h) { h = h.replace('#',''); return { r: parseInt(h.substr(0,2),16), g: parseInt(h.substr(2,2),16), b: parseInt(h.substr(4,2),16) }; }
+    var rgb = hexRgb(accentHex);
 
-    // Get accent color from CSS
-    var accentColor = getComputedStyle(document.documentElement).getPropertyValue('--c-accent').trim() || '#C9A84C';
-
-    function hexToRgb(hex) {
-      hex = hex.replace('#', '');
-      return {
-        r: parseInt(hex.substr(0, 2), 16),
-        g: parseInt(hex.substr(2, 2), 16),
-        b: parseInt(hex.substr(4, 2), 16)
-      };
-    }
-    var rgb = hexToRgb(accentColor);
-
-    // Create particles
     for (var i = 0; i < PARTICLE_COUNT; i++) {
       particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
-        size: Math.random() * 1.5 + 0.5,
-        alpha: Math.random() * 0.5 + 0.1
+        x: Math.random() * (canvas.width||800),
+        y: Math.random() * (canvas.height||600),
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        size: Math.random() * 2 + 0.5,
+        alpha: Math.random() * 0.6 + 0.15,
+        phase: Math.random() * Math.PI * 2
       });
     }
 
     function animate() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      var t = Date.now() * 0.001;
+
       particles.forEach(function(p) {
-        // Mouse repulsion
-        var dx = p.x - mouse.x;
-        var dy = p.y - mouse.y;
+        // Mouse interaction
+        var dx = p.x - mouse.x, dy = p.y - mouse.y;
         var dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 150) {
-          var force = (150 - dist) / 150 * 0.02;
+        if (dist < 180) {
+          var force = (180 - dist) / 180 * 0.015;
           p.vx += dx * force;
           p.vy += dy * force;
         }
+        p.vx *= 0.985; p.vy *= 0.985;
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0) p.x = canvas.width; if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height; if (p.y > canvas.height) p.y = 0;
 
-        // Damping
-        p.vx *= 0.99;
-        p.vy *= 0.99;
-
-        p.x += p.vx;
-        p.y += p.vy;
-
-        // Wrap
-        if (p.x < 0) p.x = canvas.width;
-        if (p.x > canvas.width) p.x = 0;
-        if (p.y < 0) p.y = canvas.height;
-        if (p.y > canvas.height) p.y = 0;
-
-        // Draw particle
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',' + p.alpha + ')';
-        ctx.fill();
+        // Preset-specific rendering
+        if (preset === 'fireflies') {
+          var glow = 0.3 + 0.7 * Math.sin(t * 1.5 + p.phase);
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.size * 1.5, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',' + (p.alpha * glow) + ')';
+          ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',0.3)';
+          ctx.fill(); ctx.shadowBlur = 0;
+        } else if (preset === 'matrix') {
+          p.vy = Math.abs(p.vy) + 0.3;
+          if (p.y > canvas.height) { p.y = 0; p.x = Math.random() * canvas.width; }
+          ctx.fillStyle = 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',' + (p.alpha * 0.6) + ')';
+          ctx.fillRect(p.x, p.y, 1.5, 6 + Math.random() * 8);
+        } else if (preset === 'aurora') {
+          var wave = Math.sin(p.x * 0.005 + t + p.phase) * 40;
+          ctx.beginPath(); ctx.arc(p.x, p.y + wave, p.size, 0, Math.PI * 2);
+          var hue = (p.x / canvas.width * 60 + t * 20) % 360;
+          ctx.fillStyle = 'hsla(' + (30 + hue * 0.3) + ', 70%, 60%, ' + (p.alpha * 0.4) + ')';
+          ctx.fill();
+        } else {
+          // connections + constellation
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',' + p.alpha + ')';
+          ctx.fill();
+        }
       });
 
-      // Draw connections
-      for (var i = 0; i < particles.length; i++) {
-        for (var j = i + 1; j < particles.length; j++) {
-          var dx = particles[i].x - particles[j].x;
-          var dy = particles[i].y - particles[j].y;
-          var dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < CONNECTION_DIST) {
-            var alpha = (1 - dist / CONNECTION_DIST) * 0.12;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',' + alpha + ')';
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
+      // Connections (for connections + constellation presets)
+      if (preset === 'connections' || preset === 'constellation') {
+        var lineWidth = preset === 'constellation' ? 0.3 : 0.6;
+        var glowing = preset === 'connections';
+        for (var i = 0; i < particles.length; i++) {
+          for (var j = i + 1; j < particles.length; j++) {
+            var dx = particles[i].x - particles[j].x;
+            var dy = particles[i].y - particles[j].y;
+            var dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < CONNECTION_DIST) {
+              var alpha = (1 - dist / CONNECTION_DIST) * (glowing ? 0.18 : 0.08);
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = 'rgba(' + rgb.r + ',' + rgb.g + ',' + rgb.b + ',' + alpha + ')';
+              ctx.lineWidth = lineWidth;
+              ctx.stroke();
+            }
           }
         }
       }
@@ -270,8 +277,7 @@
     var groups = [
       { selector: '.pillars__grid .pillar', delay: 80 },
       { selector: '.testimonials__grid .testimonial-card', delay: 120 },
-      { selector: '.about__stats .stat', delay: 100 },
-      { selector: '.articles__grid .article-card', delay: 100 }
+      { selector: '.about__stats .stat', delay: 100 }
     ];
 
     groups.forEach(function(group) {

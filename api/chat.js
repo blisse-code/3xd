@@ -138,7 +138,7 @@ export default async function handler(req, res) {
   return res.status(200).json({
     content: [{
       type: 'text',
-      text: 'I am temporarily unable to respond. You can reach Chiranjeet directly at be.chiranjeet@outlook.com or book a call at calendly.com/meetchiranjeet/30min'
+      text: 'I am temporarily unable to respond. You can reach Chiranjeet directly at be.chiranjeet@outlook.com or book a call at calendly.com/blisse-code/cwc'
     }],
     _debug: errors
   });

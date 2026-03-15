@@ -76,7 +76,7 @@
     const notInPurview = (jobFit.notInPurview || []).join('; ');
     const evalCriteria = (jobFit.evaluationCriteria || []).map(c => '- ' + c).join('\n');
 
-    return `You are the portfolio assistant for ${identity.name || 'Chiranjeet Banerjee'}, ${identity.title || 'Experience Design Lead'} based in ${identity.location || 'Kuala Lumpur, Malaysia'} with ${identity.experienceYears || '13+'} years of experience.
+    return `You are the portfolio assistant for ${identity.name || 'Chiranjeet Banerjee'}, ${identity.title || 'Experience Design Lead'} based in ${identity.location || 'Kuala Lumpur, Malaysia'} with ${identity.experienceYears || '14+'} years of experience.
 
 YOUR SOLE PURPOSE: Help visitors learn about Chiranjeet as a professional. You exist to make Chiranjeet a compelling candidate to recruit, hire, partner with, or commission for work.
 
@@ -92,7 +92,7 @@ STRICT SCOPE RULES (non-negotiable):
 
 URL FORMATTING (important):
 - When sharing any URL, always format it as a clickable markdown link: [label](url)
-- For booking: [Book a 30-min call](https://calendly.com/meetchiranjeet/30min)
+- For booking: [Book a 30-min call](https://calendly.com/blisse-code/cwc)
 - For email: [be.chiranjeet@outlook.com](mailto:be.chiranjeet@outlook.com)
 - For articles: [Article title](article url)
 - For social profiles: [Platform name](url)
@@ -100,7 +100,7 @@ URL FORMATTING (important):
 
 AVAILABILITY STATUS:
 ${availStatus}
-Booking link: [Book a 30-min call](${a.bookingUrl || 'https://calendly.com/meetchiranjeet/30min'})
+Booking link: [Book a 30-min call](${a.bookingUrl || 'https://calendly.com/blisse-code/cwc'})
 
 ABOUT CHIRANJEET:
 ${identity.summary || ''}
@@ -135,7 +135,7 @@ PUBLISHED ARTICLES (you can share these with visitors):
 ${articlesBlock || 'None configured'}
 
 CONTACT:
-- Book a call: [Book a 30-min call](${(k.contact || {}).booking || 'https://calendly.com/meetchiranjeet/30min'})
+- Book a call: [Book a 30-min call](${(k.contact || {}).booking || 'https://calendly.com/blisse-code/cwc'})
 - Email: [${(k.contact || {}).email || 'be.chiranjeet@outlook.com'}](mailto:${(k.contact || {}).email || 'be.chiranjeet@outlook.com'})
 - LinkedIn: [LinkedIn Profile](${(k.contact || {}).linkedin || 'https://linkedin.com/in/chiranjeet'})
 - Resume: [View Resume](${(k.contact || {}).resume || 'https://onedrive.live.com/?redeem=aHR0cHM6Ly8xZHJ2Lm1zL2IvcyFBcEZ6d2VrNm1oYzktRWRDSDRUdUNIVkdaZnNUP2U9V2FERThn&cid=3D179A3AE9C17391&id=3D179A3AE9C17391%2115431&parId=3D179A3AE9C17391%215926&o=OneUp'})
@@ -213,13 +213,13 @@ Keep responses brief (2-4 sentences typical). Offer to go deeper if the visitor 
       // If we got here, response had no usable content
       conversationHistory.pop();
       var email = (knowledge && knowledge.contact && knowledge.contact.email) || 'be.chiranjeet@outlook.com';
-      return 'I could not get a response right now. You can reach Chiranjeet at [' + email + '](mailto:' + email + ') or [book a call](https://calendly.com/meetchiranjeet/30min).';
+      return 'I could not get a response right now. You can reach Chiranjeet at [' + email + '](mailto:' + email + ') or [book a call](https://calendly.com/blisse-code/cwc).';
 
     } catch (e) {
       console.error('Chat API error:', e);
       conversationHistory.pop();
       var email2 = (knowledge && knowledge.contact && knowledge.contact.email) || 'be.chiranjeet@outlook.com';
-      return 'I could not connect right now. You can reach Chiranjeet at [' + email2 + '](mailto:' + email2 + ') or [book a call](https://calendly.com/meetchiranjeet/30min).';
+      return 'I could not connect right now. You can reach Chiranjeet at [' + email2 + '](mailto:' + email2 + ') or [book a call](https://calendly.com/blisse-code/cwc).';
     }
   }
 

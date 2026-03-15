@@ -1348,7 +1348,7 @@
       </div>
       <div class="form-group">
         <label class="form-label">Booking URL</label>
-        <input class="form-input" id="avail-booking" placeholder="https://calendly.com/meetchiranjeet/30min">
+        <input class="form-input" id="avail-booking" placeholder="https://calendly.com/blisse-code/cwc">
       </div>
 
       <div style="background:var(--bg-el);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-top:1.5rem">
@@ -1474,7 +1474,7 @@
           <p>Embed Calendly directly in the portfolio. Visitors click "Book a meeting" and see a popup scheduler instead of leaving the site.</p>
           <div class="form-group" style="margin-bottom:0.5rem">
             <label class="form-label">Calendly scheduling URL</label>
-            <input class="form-input" id="int-calendly-url" placeholder="https://calendly.com/meetchiranjeet/30min" value="https://calendly.com/meetchiranjeet/30min">
+            <input class="form-input" id="int-calendly-url" placeholder="https://calendly.com/blisse-code/cwc" value="https://calendly.com/blisse-code/cwc">
             <div class="form-help">Your Calendly event link. The popup widget loads automatically when this is set.</div>
           </div>
           <button class="btn btn--sm btn--primary" onclick="saveCalendlyConfig()">Save</button>
@@ -1632,41 +1632,63 @@
       <hr style="border:none;border-top:1px solid var(--border);margin:2rem 0">
 
       <h3 style="font-size:1rem;margin-bottom:1rem">Background Music</h3>
-      <p style="font-size:0.8rem;color:var(--text-2);margin-bottom:1rem">Ambient background audio for the portfolio. No UI is shown to visitors. Music starts after their first interaction with the page.</p>
+      <p style="font-size:0.8rem;color:var(--text-2);margin-bottom:1rem">Ambient audio for the portfolio. A music toggle button appears to visitors. Auto-ducks volume when interaction sounds play.</p>
 
       <div class="form-group">
-        <label class="form-label">Music source</label>
-        <select class="form-select" id="cfg-music-type" onchange="toggleMusicFields()">
+        <label class="form-label">Music mode</label>
+        <select class="form-select" id="cfg-music-mode" onchange="toggleMusicFields()">
           <option value="none">No background music</option>
-          <option value="spotify">Spotify embed</option>
-          <option value="file">Uploaded audio file</option>
+          <option value="generative">Generative (adapts to visitor interaction)</option>
+          <option value="tracks">Human tracks (Spotify or audio files, up to 5)</option>
         </select>
+        <div class="form-help">Generative mode creates ambient audio in real-time using Web Audio API, adapting tempo and tonality based on scroll position and click frequency. Human tracks play your selected music on loop.</div>
       </div>
 
-      <div id="music-spotify-fields" style="display:none">
-        <div class="form-group">
-          <label class="form-label">Spotify track or playlist URL</label>
-          <input class="form-input" id="cfg-music-spotify-url" placeholder="https://open.spotify.com/track/...">
-          <div class="form-help">Paste any Spotify track, album, or playlist link. It plays as an invisible embed. Visitors hear it after their first click/scroll.</div>
+      <div id="music-tracks-fields" style="display:none">
+        <h4 style="font-size:0.85rem;margin-bottom:0.5rem">Tracks (up to 5, played sequentially on loop)</h4>
+        <div id="music-tracks-list"></div>
+        <div style="display:flex;gap:0.5rem;margin-top:0.5rem">
+          <input class="form-input" id="music-track-add-url" placeholder="Spotify URL or audio file path" style="flex:1;font-size:0.8rem">
+          <input class="form-input" id="music-track-add-title" placeholder="Title (optional)" style="width:150px;font-size:0.8rem">
+          <button class="btn btn--sm" onclick="addMusicTrack()">Add</button>
+        </div>
+        <div style="margin-top:0.5rem">
+          <input type="file" id="music-track-upload" accept="audio/*" class="form-input" onchange="handleMusicTrackUpload(this)" style="padding:0.4rem;font-size:0.75rem">
         </div>
       </div>
 
-      <div id="music-file-fields" style="display:none">
-        <div class="form-group">
-          <label class="form-label">Upload audio file (MP3, OGG, WAV)</label>
-          <input type="file" id="cfg-music-file" accept="audio/*" class="form-input" onchange="handleMusicUpload(this)" style="padding:0.5rem">
-          <div class="form-help">Keep file under 5MB for fast loading. Loops automatically.</div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Audio file path (after upload)</label>
-          <input class="form-input" id="cfg-music-file-path" placeholder="audio/background.mp3">
-        </div>
-      </div>
-
-      <div class="form-group">
+      <div class="form-group" style="margin-top:1rem">
         <label class="form-label">Volume (0.0 to 1.0)</label>
         <input class="form-input" id="cfg-music-volume" type="number" min="0" max="1" step="0.05" value="0.15">
-        <div class="form-help">0.15 is subtle background level. 0.3 is noticeable. 0.5 is prominent.</div>
+        <div class="form-help">0.15 is subtle. 0.3 is noticeable. 0.5 is prominent.</div>
+      </div>
+
+      <hr style="border:none;border-top:1px solid var(--border);margin:2rem 0">
+
+      <h3 style="font-size:1rem;margin-bottom:1rem">Particle Effects</h3>
+      <p style="font-size:0.8rem;color:var(--text-2);margin-bottom:1rem">Background particle animation that adds depth to the portfolio.</p>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Effect preset</label>
+          <select class="form-select" id="cfg-particle-preset">
+            <option value="connections">Glowing Connections (grid lines)</option>
+            <option value="constellation">Constellation (star map)</option>
+            <option value="fireflies">Fireflies (floating glow)</option>
+            <option value="matrix">Matrix Rain (vertical streams)</option>
+            <option value="aurora">Aurora (flowing waves)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Density (1 = sparse, 5 = dense)</label>
+          <select class="form-select" id="cfg-particle-density">
+            <option value="1">1 - Minimal</option>
+            <option value="2">2 - Light</option>
+            <option value="3" selected>3 - Medium</option>
+            <option value="4">4 - Rich</option>
+            <option value="5">5 - Dense</option>
+          </select>
+        </div>
       </div>
 
       <div class="btn-group" style="margin-top:1.5rem">
@@ -3369,13 +3391,18 @@ async function loadSiteConfig() {
   document.getElementById('cfg-logo-path').value = siteConfig.logoPath || '';
   document.getElementById('cfg-favicon-path').value = siteConfig.faviconPath || 'icons/favicon.png';
 
-  // Music fields
+  // Music
   var music = siteConfig.backgroundMusic || {};
-  document.getElementById('cfg-music-type').value = music.type || 'none';
-  document.getElementById('cfg-music-spotify-url').value = music.url && music.type === 'spotify' ? music.url : '';
-  document.getElementById('cfg-music-file-path').value = music.url && music.type === 'file' ? music.url : '';
+  document.getElementById('cfg-music-mode').value = music.mode || 'none';
   document.getElementById('cfg-music-volume').value = music.volume !== undefined ? music.volume : 0.15;
+  window._musicTracks = music.tracks || [];
+  renderMusicTracks();
   toggleMusicFields();
+
+  // Particles
+  var particles = siteConfig.particles || {};
+  document.getElementById('cfg-particle-preset').value = particles.preset || 'connections';
+  document.getElementById('cfg-particle-density').value = particles.density || 3;
 }
 
 function handleLogoUpload(input, type) {
@@ -3397,23 +3424,51 @@ function handleLogoUpload(input, type) {
 }
 
 function toggleMusicFields() {
-  var type = document.getElementById('cfg-music-type').value;
-  document.getElementById('music-spotify-fields').style.display = type === 'spotify' ? '' : 'none';
-  document.getElementById('music-file-fields').style.display = type === 'file' ? '' : 'none';
+  var m = document.getElementById('cfg-music-mode').value;
+  document.getElementById('music-tracks-fields').style.display = m === 'tracks' ? '' : 'none';
 }
 
-function handleMusicUpload(input) {
+function renderMusicTracks() {
+  var list = document.getElementById('music-tracks-list');
+  if (!list) return;
+  if (!window._musicTracks || window._musicTracks.length === 0) {
+    list.innerHTML = '<p style="font-size:0.75rem;color:var(--text-3)">No tracks added. Add Spotify URLs or upload audio files.</p>';
+    return;
+  }
+  list.innerHTML = window._musicTracks.map(function(t, i) {
+    var title = typeof t === 'string' ? t : (t.title || t.url || 'Track ' + (i+1));
+    var url = typeof t === 'string' ? t : (t.url || '');
+    return '<div class="card" style="padding:0.5rem 0.75rem;margin-bottom:0.3rem;display:flex;justify-content:space-between;align-items:center"><div style="font-size:0.8rem;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">' + escapeHtml(title) + '<br><span style="font-size:0.65rem;color:var(--text-3)">' + escapeHtml(url).slice(0,60) + '</span></div><button class="btn btn--sm btn--danger" onclick="removeMusicTrack(' + i + ')" style="padding:0.15rem 0.4rem;font-size:0.7rem">&times;</button></div>';
+  }).join('');
+}
+
+function addMusicTrack() {
+  var url = document.getElementById('music-track-add-url').value.trim();
+  if (!url) { toast('Enter a URL or path', 'error'); return; }
+  if (!window._musicTracks) window._musicTracks = [];
+  if (window._musicTracks.length >= 5) { toast('Maximum 5 tracks', 'error'); return; }
+  var title = document.getElementById('music-track-add-title').value.trim() || url.split('/').pop();
+  window._musicTracks.push({ url: url, title: title });
+  document.getElementById('music-track-add-url').value = '';
+  document.getElementById('music-track-add-title').value = '';
+  renderMusicTracks();
+  toast('Track added');
+}
+
+function removeMusicTrack(i) {
+  window._musicTracks.splice(i, 1);
+  renderMusicTracks();
+}
+
+function handleMusicTrackUpload(input) {
   var file = input.files[0];
   if (!file) return;
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    var path = 'audio/' + file.name;
-    document.getElementById('cfg-music-file-path').value = path;
-    // Store for deploy
-    uploadedImages.push({ name: file.name, dataUrl: e.target.result, path: path });
-    toast('Audio file ready: ' + file.name);
-  };
-  reader.readAsDataURL(file);
+  if (!window._musicTracks) window._musicTracks = [];
+  if (window._musicTracks.length >= 5) { toast('Max 5 tracks', 'error'); input.value = ''; return; }
+  var path = 'audio/' + file.name;
+  window._musicTracks.push({ url: path, title: file.name });
+  renderMusicTracks();
+  toast('Audio queued: ' + file.name);
   input.value = '';
 }
 
@@ -3423,16 +3478,18 @@ function saveSiteConfig() {
   siteConfig.logoPath = document.getElementById('cfg-logo-path').value.trim();
   siteConfig.faviconPath = document.getElementById('cfg-favicon-path').value.trim();
 
-  // Music config
-  var musicType = document.getElementById('cfg-music-type').value;
-  var musicUrl = '';
-  if (musicType === 'spotify') musicUrl = document.getElementById('cfg-music-spotify-url').value.trim();
-  else if (musicType === 'file') musicUrl = document.getElementById('cfg-music-file-path').value.trim();
+  // Music
   siteConfig.backgroundMusic = {
-    type: musicType,
-    url: musicUrl,
+    mode: document.getElementById('cfg-music-mode').value,
+    tracks: window._musicTracks || [],
     volume: parseFloat(document.getElementById('cfg-music-volume').value) || 0.15,
     autoplay: true
+  };
+
+  // Particles
+  siteConfig.particles = {
+    preset: document.getElementById('cfg-particle-preset').value,
+    density: parseInt(document.getElementById('cfg-particle-density').value) || 3
   };
 
   toast('Site config saved. Deploy to apply.');

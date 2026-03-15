@@ -35,9 +35,18 @@
     }
   ],
   "backgroundMusic": {
-    "type": "spotify",
-    "url": "https://open.spotify.com/track/2UZZtkoLOg7IHxeTAdPFvd?si=d78af53fdb6b4e8a",
+    "mode": "tracks",
+    "tracks": [
+      {
+        "url": "https://open.spotify.com/track/2UZZtkoLOg7IHxeTAdPFvd?si=d78af53fdb6b4e8a",
+        "title": "User's Spotify track"
+      }
+    ],
     "volume": 0.7,
     "autoplay": true
+  },
+  "particles": {
+    "preset": "connections",
+    "density": 3
   }
 }

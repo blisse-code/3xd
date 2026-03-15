@@ -24,6 +24,7 @@
   // === SOUND DEFINITIONS ===
   function playClick() {
     if (!soundEnabled) return;
+    if (window.BgAudioDuck) window.BgAudioDuck();
     var c = getCtx();
     var osc = c.createOscillator();
     var gain = c.createGain();
@@ -39,6 +40,7 @@
 
   function playHover() {
     if (!soundEnabled) return;
+    if (window.BgAudioDuck) window.BgAudioDuck();
     var c = getCtx();
     var osc = c.createOscillator();
     var gain = c.createGain();
@@ -54,6 +56,7 @@
 
   function playChatOpen() {
     if (!soundEnabled) return;
+    if (window.BgAudioDuck) window.BgAudioDuck();
     var c = getCtx();
     [440, 554, 659].forEach(function(freq, i) {
       var osc = c.createOscillator();
@@ -72,6 +75,7 @@
 
   function playChatClose() {
     if (!soundEnabled) return;
+    if (window.BgAudioDuck) window.BgAudioDuck();
     var c = getCtx();
     [659, 554, 440].forEach(function(freq, i) {
       var osc = c.createOscillator();
@@ -90,6 +94,7 @@
 
   function playMessageSend() {
     if (!soundEnabled) return;
+    if (window.BgAudioDuck) window.BgAudioDuck();
     var c = getCtx();
     var osc = c.createOscillator();
     var gain = c.createGain();
@@ -106,6 +111,7 @@
 
   function playMessageReceive() {
     if (!soundEnabled) return;
+    if (window.BgAudioDuck) window.BgAudioDuck();
     var c = getCtx();
     var osc = c.createOscillator();
     var gain = c.createGain();
@@ -123,6 +129,7 @@
 
   function playToggle() {
     if (!soundEnabled) return;
+    if (window.BgAudioDuck) window.BgAudioDuck();
     var c = getCtx();
     var osc = c.createOscillator();
     var gain = c.createGain();
