@@ -589,31 +589,8 @@
     <section class="articles container" id="articles" aria-label="Writing and thought leadership">
       <p class="section-label reveal">Writing</p>
       <h2 class="section-title reveal">Recent thinking</h2>
-      <div class="articles__grid">
-        <a href="https://blissecode.substack.com/p/the-compliance-flow-and-the-boardroom" target="_blank" rel="noopener" class="article-card reveal">
-          <div class="article-card__body">
-            <span class="article-card__source">Substack</span>
-            <h3 class="article-card__title">The Compliance Flow and the Boardroom Are the Same Design Problem</h3>
-            <p class="article-card__excerpt">Why the most important screen you will ever design is the one your stakeholder never sees, and the conversation they will never admit they need.</p>
-            <span class="article-card__meta">Feb 28, 2026</span>
-          </div>
-        </a>
-        <a href="https://blissecode.substack.com/p/thermodynamics-of-ai" target="_blank" rel="noopener" class="article-card reveal">
-          <div class="article-card__body">
-            <span class="article-card__source">Substack</span>
-            <h3 class="article-card__title">Thermodynamics of AI: Why You Are Exhausted</h3>
-            <p class="article-card__excerpt">AI drove the cost of production to zero but the cost of verification stayed the same. The biology is paying the price for the broken physics of work.</p>
-            <span class="article-card__meta">Feb 12, 2026</span>
-          </div>
-        </a>
-        <a href="https://blissecode.substack.com/p/the-cargo-cult-of-ai" target="_blank" rel="noopener" class="article-card reveal">
-          <div class="article-card__body">
-            <span class="article-card__source">Substack</span>
-            <h3 class="article-card__title">The Cargo Cult of AI</h3>
-            <p class="article-card__excerpt">Why prompt libraries are a trap, fluency is the only way out, and we are treating the most fluid technology in history with the rigid bureaucracy of a call center.</p>
-            <span class="article-card__meta">Feb 11, 2026</span>
-          </div>
-        </a>
+      <div class="articles__grid" id="articles-grid">
+        <!-- Loaded dynamically from articles.json -->
       </div>
     </section>
 
@@ -902,6 +879,36 @@
       } catch (e) { /* defaults in HTML */ }
     }
     loadSocialLinks();
+
+    // Articles loader: reads articles.json and renders cards dynamically
+    async function loadArticles() {
+      try {
+        var res = await fetch('articles.json');
+        if (!res.ok) return;
+        var data = await res.json();
+        var articles = data.articles;
+        if (!articles || articles.length === 0) return;
+        var grid = document.getElementById('articles-grid');
+        if (!grid) return;
+        grid.innerHTML = articles.map(function(a) {
+          var dateStr = '';
+          if (a.date) {
+            try {
+              var d = new Date(a.date);
+              dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            } catch(e) { dateStr = a.date; }
+          }
+          return '<a href="' + a.url + '" target="_blank" rel="noopener" class="article-card reveal">' +
+            '<div class="article-card__body">' +
+              '<span class="article-card__source">' + (a.source || 'Article') + '</span>' +
+              '<h3 class="article-card__title">' + a.title + '</h3>' +
+              '<p class="article-card__excerpt">' + (a.excerpt || '') + '</p>' +
+              '<span class="article-card__meta">' + dateStr + '</span>' +
+            '</div></a>';
+        }).join('');
+      } catch (e) { /* articles.json not found, section stays empty */ }
+    }
+    loadArticles();
 
     // GSAP ScrollTrigger animations
     window.addEventListener('load', function() {

@@ -1,0 +1,25 @@
+{
+  "articles": [
+    {
+      "title": "The Compliance Flow and the Boardroom Are the Same Design Problem",
+      "url": "https://blissecode.substack.com/p/the-compliance-flow-and-the-boardroom",
+      "source": "Substack",
+      "date": "2026-02-28",
+      "excerpt": "Why the most important screen you will ever design is the one your stakeholder never sees, and the conversation they will never admit they need."
+    },
+    {
+      "title": "Thermodynamics of AI: Why You Are Exhausted",
+      "url": "https://blissecode.substack.com/p/thermodynamics-of-ai",
+      "source": "Substack",
+      "date": "2026-02-12",
+      "excerpt": "AI drove the cost of production to zero but the cost of verification stayed the same. The biology is paying the price for the broken physics of work."
+    },
+    {
+      "title": "The Cargo Cult of AI",
+      "url": "https://blissecode.substack.com/p/the-cargo-cult-of-ai",
+      "source": "Substack",
+      "date": "2026-02-11",
+      "excerpt": "Why prompt libraries are a trap, fluency is the only way out, and we are treating the most fluid technology in history with the rigid bureaucracy of a call center."
+    }
+  ]
+}

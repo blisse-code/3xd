@@ -547,6 +547,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
         Social Links
       </li>
+      <li class="sidebar__item" data-page="articles-mgmt" onclick="switchPage('articles-mgmt', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        Articles
+      </li>
       <li class="sidebar__section">AI Assistant</li>
       <li class="sidebar__item" data-page="knowledge" onclick="switchPage('knowledge', this)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
@@ -1138,6 +1142,71 @@
       <div class="btn-group" style="margin-top:2rem">
         <button class="btn btn--primary" onclick="saveSocialLinks()">Save social links</button>
         <button class="btn" onclick="exportSocialLinks()">Download site-config.json</button>
+      </div>
+    </div>
+
+    <!-- ARTICLES MANAGEMENT -->
+    <div class="page" id="page-articles-mgmt">
+      <div class="page-header">
+        <h2>Articles</h2>
+        <p>Manage published articles shown on the portfolio. Import from URLs or add manually.</p>
+      </div>
+
+      <!-- Import from URL -->
+      <div style="background:var(--bg-el);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1.5rem">
+        <h4 style="font-size:0.9rem;margin-bottom:0.75rem">Import from URL</h4>
+        <p style="font-size:0.8rem;color:var(--text-2);margin-bottom:0.75rem">Paste a Substack, Medium, LinkedIn, or any article URL. Metadata is extracted automatically.</p>
+        <div style="display:flex;gap:0.5rem">
+          <input class="form-input" id="art-import-url" placeholder="https://blissecode.substack.com/p/..." style="flex:1;font-size:0.85rem">
+          <button class="btn btn--primary btn--sm" onclick="importArticleFromUrl()" id="art-import-btn">Import</button>
+        </div>
+        <div id="art-import-preview" style="margin-top:0.75rem"></div>
+      </div>
+
+      <!-- Articles list -->
+      <h3 style="font-size:0.95rem;margin-bottom:0.75rem">Current Articles (<span id="art-count">0</span>)</h3>
+      <div id="art-list"></div>
+
+      <!-- Manual add -->
+      <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--border)">
+        <h4 style="font-size:0.9rem;margin-bottom:0.75rem">Add manually</h4>
+        <div class="form-group">
+          <label class="form-label">Title</label>
+          <input class="form-input" id="art-manual-title">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">URL</label>
+            <input class="form-input" id="art-manual-url" placeholder="https://...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Source</label>
+            <select class="form-select" id="art-manual-source">
+              <option>Substack</option>
+              <option>Medium</option>
+              <option>LinkedIn</option>
+              <option>Dev.to</option>
+              <option>Blog</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Date</label>
+            <input class="form-input" id="art-manual-date" type="date">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Excerpt</label>
+            <input class="form-input" id="art-manual-excerpt" placeholder="Short description">
+          </div>
+        </div>
+        <button class="btn btn--sm" onclick="addManualArticle()">Add article</button>
+      </div>
+
+      <div class="btn-group" style="margin-top:2rem">
+        <button class="btn btn--primary" onclick="saveArticles()">Save and deploy articles</button>
+        <button class="btn" onclick="exportArticlesJson()">Download articles.json</button>
       </div>
     </div>
 
@@ -3039,6 +3108,170 @@ async function testGCalConnection() {
   }
 }
 
+// ===== ARTICLES MANAGEMENT =====
+let articlesData = [];
+
+async function loadArticlesData() {
+  try {
+    var res = await fetch('articles.json');
+    if (res.ok) {
+      var data = await res.json();
+      articlesData = data.articles || [];
+    }
+  } catch (e) {}
+  renderArticlesList();
+}
+
+function renderArticlesList() {
+  var list = document.getElementById('art-list');
+  var countEl = document.getElementById('art-count');
+  if (countEl) countEl.textContent = articlesData.length;
+
+  if (articlesData.length === 0) {
+    list.innerHTML = '<div class="empty-state"><p>No articles yet. Import from URL or add manually.</p></div>';
+    return;
+  }
+
+  list.innerHTML = articlesData.map(function(a, i) {
+    return '<div class="card" style="margin-bottom:0.5rem">' +
+      '<div class="card__header">' +
+        '<div>' +
+          '<div class="card__title">' + escapeHtml(a.title || '') + '</div>' +
+          '<div class="card__meta">' + (a.source || '') + ' / ' + (a.date || '') + '</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:0.3rem">' +
+          '<button class="btn btn--sm" onclick="moveArticle(' + i + ',-1)" title="Move up" style="padding:0.2rem 0.5rem">&uarr;</button>' +
+          '<button class="btn btn--sm" onclick="moveArticle(' + i + ',1)" title="Move down" style="padding:0.2rem 0.5rem">&darr;</button>' +
+          '<button class="btn btn--sm btn--danger" onclick="removeArticle(' + i + ')" style="padding:0.2rem 0.5rem">&times;</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="card__desc">' + escapeHtml(a.excerpt || '') + '</div>' +
+      '<a href="' + a.url + '" target="_blank" rel="noopener" style="font-size:0.7rem;font-family:var(--mono);color:var(--text-3)">' + escapeHtml(a.url || '') + '</a>' +
+    '</div>';
+  }).join('');
+}
+
+async function importArticleFromUrl() {
+  var url = document.getElementById('art-import-url').value.trim();
+  if (!url) { toast('Enter a URL', 'error'); return; }
+
+  var btn = document.getElementById('art-import-btn');
+  btn.textContent = 'Fetching...';
+  btn.disabled = true;
+  var previewEl = document.getElementById('art-import-preview');
+  previewEl.innerHTML = '<div class="loader"><span class="loader__dot"></span><span class="loader__dot"></span><span class="loader__dot"></span>Extracting metadata...</div>';
+
+  try {
+    var adminKey = typeof siteConfig !== 'undefined' && siteConfig.adminKey ? siteConfig.adminKey : '';
+    var res = await fetch('/api/fetch-article', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey },
+      body: JSON.stringify({ url: url })
+    });
+    var data = await res.json();
+
+    if (data.error) {
+      previewEl.innerHTML = '<p style="color:var(--danger);font-size:0.85rem">' + escapeHtml(data.error) + '</p>';
+    } else {
+      previewEl.innerHTML = '<div class="card" style="margin-top:0.5rem">' +
+        '<div class="card__title">' + escapeHtml(data.title || '') + '</div>' +
+        '<div class="card__meta" style="margin:0.25rem 0">' + escapeHtml(data.source || '') + ' / ' + escapeHtml(data.date || '') + '</div>' +
+        '<div class="card__desc">' + escapeHtml(data.excerpt || '') + '</div>' +
+        '<button class="btn btn--primary btn--sm" onclick="confirmImportArticle()">Add to articles</button>' +
+      '</div>';
+      // Store temporarily
+      window._pendingArticle = data;
+    }
+  } catch (e) {
+    previewEl.innerHTML = '<p style="color:var(--danger);font-size:0.85rem">Import failed: ' + escapeHtml(e.message) + '</p>';
+  }
+
+  btn.textContent = 'Import';
+  btn.disabled = false;
+}
+
+function confirmImportArticle() {
+  if (!window._pendingArticle) return;
+  var a = window._pendingArticle;
+  articlesData.unshift({
+    title: a.title || '',
+    url: a.url || '',
+    source: a.source || 'Article',
+    date: a.date || '',
+    excerpt: a.excerpt || ''
+  });
+  window._pendingArticle = null;
+  document.getElementById('art-import-url').value = '';
+  document.getElementById('art-import-preview').innerHTML = '';
+  renderArticlesList();
+  toast('Article imported');
+}
+
+function addManualArticle() {
+  var title = document.getElementById('art-manual-title').value.trim();
+  if (!title) { toast('Title required', 'error'); return; }
+  articlesData.push({
+    title: title,
+    url: document.getElementById('art-manual-url').value.trim(),
+    source: document.getElementById('art-manual-source').value,
+    date: document.getElementById('art-manual-date').value,
+    excerpt: document.getElementById('art-manual-excerpt').value.trim()
+  });
+  document.getElementById('art-manual-title').value = '';
+  document.getElementById('art-manual-url').value = '';
+  document.getElementById('art-manual-date').value = '';
+  document.getElementById('art-manual-excerpt').value = '';
+  renderArticlesList();
+  toast('Article added');
+}
+
+function removeArticle(i) {
+  if (!confirm('Remove this article?')) return;
+  articlesData.splice(i, 1);
+  renderArticlesList();
+  toast('Article removed');
+}
+
+function moveArticle(i, dir) {
+  var j = i + dir;
+  if (j < 0 || j >= articlesData.length) return;
+  var temp = articlesData[i];
+  articlesData[i] = articlesData[j];
+  articlesData[j] = temp;
+  renderArticlesList();
+}
+
+function saveArticles() {
+  var json = JSON.stringify({ articles: articlesData }, null, 2);
+  // Deploy via one-click if available
+  deployFiles([
+    { path: 'articles.json', content: json, desc: 'Articles data' }
+  ], 'Update articles from CMS');
+  toast('Articles saved and deploying');
+}
+
+function exportArticlesJson() {
+  downloadFile('articles.json', JSON.stringify({ articles: articlesData }, null, 2));
+  toast('articles.json downloaded');
+}
+
+// Helper to deploy specific files
+async function deployFiles(files, message) {
+  try {
+    var adminKey = typeof siteConfig !== 'undefined' && siteConfig.adminKey ? siteConfig.adminKey : '';
+    var res = await fetch('/api/deploy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Admin-Key': adminKey },
+      body: JSON.stringify({ files: files, message: message || 'Update from CMS' })
+    });
+    var data = await res.json();
+    if (data.success) toast('Deployed: ' + (data.message || ''));
+    else toast('Deploy issue: ' + (data.error || ''), 'error');
+  } catch (e) {
+    toast('Deploy failed. Download files manually.', 'error');
+  }
+}
+
 function escapeHtml(text) {
   const div = document.createElement('div');
   div.textContent = text;
@@ -3436,6 +3669,7 @@ loadManifest = async function() {
   try { await loadAvailability(); } catch(e) {}
   try { await loadSiteConfig(); } catch(e) {}
   try { await loadSocialLinks(); } catch(e) {}
+  try { await loadArticlesData(); } catch(e) {}
   try { renderDeployFileList(); } catch(e) {}
   try { refreshInsights(); } catch(e) {}
 };
