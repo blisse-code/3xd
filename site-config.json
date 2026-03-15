@@ -35,7 +35,7 @@
     }
   ],
   "backgroundMusic": {
-    "mode": "tracks",
+    "mode": "generative",
     "tracks": [
       {
         "url": "https://open.spotify.com/track/2UZZtkoLOg7IHxeTAdPFvd?si=d78af53fdb6b4e8a",
@@ -46,7 +46,7 @@
     "autoplay": true
   },
   "particles": {
-    "preset": "connections",
+    "preset": "aurora",
     "density": 3
   }
 }
