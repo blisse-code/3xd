@@ -35,8 +35,8 @@
     }
   ],
   "backgroundMusic": {
-    "type": "none",
-    "url": "",
+    "type": "spotify",
+    "url": "https://open.spotify.com/track/2UZZtkoLOg7IHxeTAdPFvd?si=d78af53fdb6b4e8a",
     "volume": 0.15,
     "autoplay": true
   }
