@@ -8,7 +8,11 @@
       "type": "Product Design",
       "domain": "EdTech",
       "summary": "Optimized self-paced learning for students from low-income families. Focused on reducing cognitive load and improving completion rates in resource-constrained environments.",
-      "tags": ["UX Design", "EdTech", "Research"],
+      "tags": [
+        "UX Design",
+        "EdTech",
+        "Research"
+      ],
       "thumbnail": null,
       "file": "case-studies/quiz-application-students.md",
       "images": [],
@@ -26,7 +30,11 @@
       "type": "Product Design",
       "domain": "Enterprise / EdTech",
       "summary": "Reduced administrative effort and time for teachers while scaling the application globally. Restructured information architecture to support multi-region operations.",
-      "tags": ["UX Design", "Enterprise", "IA"],
+      "tags": [
+        "UX Design",
+        "Enterprise",
+        "IA"
+      ],
       "thumbnail": null,
       "file": "case-studies/user-management-application.md",
       "images": [],
@@ -44,7 +52,11 @@
       "type": "Product Design",
       "domain": "Travel",
       "summary": "Improved preference integration during the traveller decision process. Designed filtering and recommendation patterns that reduced search-to-book friction.",
-      "tags": ["UX Design", "Travel", "Conversion"],
+      "tags": [
+        "UX Design",
+        "Travel",
+        "Conversion"
+      ],
       "thumbnail": null,
       "file": "case-studies/hotel-booking-experience.md",
       "images": [],
@@ -62,7 +74,11 @@
       "type": "Product Design",
       "domain": "EdTech",
       "summary": "Improved visibility for business on teacher empowerment programs while making events discoverable for all teachers.",
-      "tags": ["UX Design", "EdTech", "Discovery"],
+      "tags": [
+        "UX Design",
+        "EdTech",
+        "Discovery"
+      ],
       "thumbnail": null,
       "file": "case-studies/event-management-application.md",
       "images": [],
@@ -80,7 +96,11 @@
       "type": "Product Design",
       "domain": "Fintech",
       "summary": "Responsive web design for a financial services customer portal. Early responsive implementation solving complex data display challenges on mobile.",
-      "tags": ["UX Design", "Fintech", "Responsive"],
+      "tags": [
+        "UX Design",
+        "Fintech",
+        "Responsive"
+      ],
       "thumbnail": null,
       "file": "case-studies/fintech-customer-portal.md",
       "images": [],

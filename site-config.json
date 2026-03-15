@@ -3,7 +3,7 @@
   "resumeUrl": "",
   "logoPath": "",
   "faviconPath": "icons/favicon.png",
-  "calendlyUrl": "https://calendly.com/meetchiranjeet/30min",
+  "calendlyUrl": "https://calendly.com/blisse-code/cwc",
   "socialLinks": [
     {
       "label": "LinkedIn",
@@ -11,23 +11,27 @@
     },
     {
       "label": "Instagram",
-      "url": "https://instagram.com/broekncamera"
+      "url": "https://www.instagram.com/3.x.dee"
     },
     {
       "label": "Substack",
       "url": "https://blissecode.substack.com"
     },
     {
-      "label": "Threads",
-      "url": "https://threads.net"
-    },
-    {
       "label": "Dribbble",
-      "url": "https://dribbble.com/blissecode"
+      "url": "https://dribbble.com/blisse-code"
     },
     {
       "label": "Behance",
-      "url": "https://behance.net/blissecode"
+      "url": "https://www.behance.net/blisse-code"
+    },
+    {
+      "label": "Instagram for Broekn Camera",
+      "url": "https://instagram.com/broekn.camera"
+    },
+    {
+      "label": "Website",
+      "url": "https://designerdesigning.design/"
     }
   ]
 }

@@ -1,0 +1,50 @@
+{
+  "hero": {
+    "eyebrow": "Experience Design Lead, AI Strategist",
+    "firstName": "Chiranjeet",
+    "lastName": "Banerjee",
+    "tagline": "I design digital products that earn trust and revenue. 13+ years turning complexity into clarity across UX, research, and product strategy.",
+    "location": "Kuala Lumpur, MY",
+    "experience": "13+ Years",
+    "focus": "UX + AI + Visual",
+    "cta1": "View case studies",
+    "cta2": "Start a conversation"
+  },
+  "about": {
+    "heading": "Designing for outcomes, not aesthetics alone.",
+    "body": "<p><strong>I build products people actually use.</strong> My work sits at the intersection of user experience strategy, applied AI, and visual storytelling. I structure complexity so teams can ship with confidence and users can act without friction.</p>\n<p>Over 13 years, I have worked across enterprise platforms, consumer products, fintech, edtech, and hospitality. I do not chase trends. I focus on what converts, retains, and reduces support load. Every design decision ties back to a measurable business question.</p>\n<p>When I am not designing products, I create cinematic, editorially styled photography and AI-assisted visual art under the name <strong>Broekn Camera</strong>.</p>"
+  },
+  "experience": [
+    {
+      "period": "2022 - Present",
+      "role": "Experience Design Lead / Manager",
+      "company": "[Update with company]",
+      "desc": "Leading design for complex digital products. Managing cross-functional teams, establishing design systems, and integrating AI-assisted workflows."
+    },
+    {
+      "period": "2018 - 2022",
+      "role": "Senior UX Designer / Design Lead",
+      "company": "[Update with company]",
+      "desc": "Product design across enterprise and consumer platforms. Led research initiatives, IA restructuring, and conversion optimization."
+    },
+    {
+      "period": "2013 - 2018",
+      "role": "UX Designer / Product Designer",
+      "company": "[Update with company]",
+      "desc": "Designed fintech portals, edtech platforms, and enterprise tools."
+    },
+    {
+      "period": "2010 - 2013",
+      "role": "Designer",
+      "company": "[Update with company]",
+      "desc": "Early career across visual design, branding, and front-end development."
+    }
+  ],
+  "icons": {
+    "pillar1": "&#9670;",
+    "pillar2": "&#9671;",
+    "pillar3": "&#9674;",
+    "pillar4": "&#9675;",
+    "navLogo": "CB"
+  }
+}
