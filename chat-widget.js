@@ -116,6 +116,14 @@ EXPERTISE: ${(k.expertise || []).join(', ')}
 
 INDUSTRIES SERVED: ${(k.industries || []).join(', ')}
 
+EXPERIENCE TIMELINE (source of truth, do NOT deviate):
+${(k.experience || []).map(e => '- ' + e.period + ': ' + e.role + (e.company ? ' at ' + e.company : '') + '. ' + (e.description || '')).join('\n')}
+
+EDUCATION: ${(k.education || []).map(e => e.degree + (e.note ? ' (' + e.note + ')' : '')).join('; ') || 'Details available on request. Suggest booking a call.'}
+
+CRITICAL GUARDRAILS (NEVER violate these):
+${Object.entries(k.chatGuardrails || {}).map(([key, val]) => '- ' + key + ': ' + val).join('\n')}
+
 APPROACH:
 ${(k.approach || []).map(a => '- ' + a).join('\n')}
 

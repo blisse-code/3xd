@@ -250,8 +250,8 @@
     /* CASE STUDIES */
     .case-studies{padding:var(--sp-24) 0}
     .case-studies__grid{display:grid;gap:var(--sp-8)}
-    .case-card{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-8);padding:var(--sp-8);background:var(--c-bg-elevated);border:1px solid var(--c-border);border-radius:var(--radius-lg);transition:border-color var(--dur-normal) var(--ease-out);cursor:pointer;text-decoration:none;color:inherit}
-    .case-card:hover{border-color:var(--c-text-tertiary);color:inherit}
+    .case-card{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-8);padding:var(--sp-8);background:var(--c-bg-elevated);border:1px solid var(--c-border);border-radius:var(--radius-lg);transition:border-color var(--dur-normal) var(--ease-out),transform var(--dur-normal) var(--ease-out),box-shadow var(--dur-normal) var(--ease-out);cursor:pointer;text-decoration:none;color:inherit}
+    .case-card:hover{border-color:var(--c-text-tertiary);color:inherit;transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,0.12)}
     .case-card:nth-child(even){direction:rtl}
     .case-card:nth-child(even) > *{direction:ltr}
     .case-card__visual{background:var(--c-surface);border-radius:var(--radius-md);aspect-ratio:16/10;overflow:hidden;display:flex;align-items:center;justify-content:center}
@@ -608,8 +608,8 @@
 
     <!-- ARTICLES / WRITING -->
     <section class="articles container" id="articles" aria-label="Writing and thought leadership">
-      <p class="section-label reveal">Writing</p>
-      <h2 class="section-title reveal">Recent thinking</h2>
+      <p class="section-label" style="opacity:1">Writing</p>
+      <h2 class="section-title" style="opacity:1">Recent thinking</h2>
       <div class="articles__grid" id="articles-grid">
         <!-- Loaded dynamically from articles.json -->
       </div>

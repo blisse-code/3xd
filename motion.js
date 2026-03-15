@@ -147,11 +147,11 @@
         var rotateX = ((y - centerY) / centerY) * -4;
         var rotateY = ((x - centerX) / centerX) * 4;
 
-        card.style.transform = 'perspective(800px) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) scale3d(1.02,1.02,1.02)';
+        card.style.transform = 'perspective(800px) rotateX(' + rotateX + 'deg) rotateY(' + rotateY + 'deg) scale3d(1.02,1.02,1.02) translateY(-3px)';
       });
 
       card.addEventListener('mouseleave', function() {
-        card.style.transform = 'perspective(800px) rotateX(0) rotateY(0) scale3d(1,1,1)';
+        card.style.transform = '';
       });
     });
   }

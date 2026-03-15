@@ -226,5 +226,51 @@
       "source": "Designlab",
       "text": "Being new to my design journey, I felt a lot of imposter syndrome, but Chiranjeet was easy to talk to and provided much objective, precise, and consistent feedback that helped me navigate this course. He is very knowledgeable in this field and provided invaluable insight into the industry."
     }
-  ]
+  ],
+  "experience": [
+    {
+      "period": "2022 - Present",
+      "role": "Experience Design Lead / Manager",
+      "company": "Applied AI (confidential)",
+      "location": "Kuala Lumpur, Malaysia",
+      "description": "Leading experience design for AI-powered products. Managing design team, driving design strategy, establishing design systems, and integrating AI workflows into product development.",
+      "type": "current"
+    },
+    {
+      "period": "2018 - 2022",
+      "role": "Senior UX Designer / Design Lead",
+      "company": "Confidential",
+      "description": "Product design across enterprise and consumer platforms. Led research initiatives, IA restructuring, and conversion optimization projects.",
+      "type": "past"
+    },
+    {
+      "period": "2013 - 2018",
+      "role": "UX Designer / Product Designer",
+      "company": "Confidential",
+      "description": "Designed fintech portals, edtech platforms, and enterprise tools. Built foundational skills in information architecture, usability testing, and responsive design.",
+      "type": "past"
+    },
+    {
+      "period": "2010 - 2013",
+      "role": "Designer",
+      "company": "Confidential",
+      "description": "Early career across visual design, branding, and front-end development. Built a cross-disciplinary foundation.",
+      "type": "past"
+    }
+  ],
+  "education": [
+    {
+      "degree": "Design-related degree",
+      "note": "Specific institution details are confidential. Ask Chiranjeet directly for details."
+    }
+  ],
+  "chatGuardrails": {
+    "experienceYears": "14+ (since 2010). NEVER say 13+ or any other number.",
+    "currentRole": "Experience Design Lead / Manager at Applied AI. NEVER fabricate company names.",
+    "location": "Kuala Lumpur, Malaysia. NEVER say any other location.",
+    "education": "Do NOT fabricate any specific university, degree name, or graduation year. If asked about education, say details are available on request and suggest booking a call.",
+    "companies": "Previous company names are CONFIDENTIAL. NEVER fabricate or guess company names. Say \"confidential\" if asked.",
+    "awards": "Do NOT fabricate any awards, certifications, or publications that are not explicitly listed here.",
+    "metrics": "Do NOT fabricate specific metrics (conversion rates, revenue numbers, user counts) unless explicitly provided in the knowledge base."
+  }
 }
