@@ -1629,6 +1629,46 @@
         <input class="form-input" id="cfg-resume-label" value="View resume" placeholder="View resume">
       </div>
 
+      <hr style="border:none;border-top:1px solid var(--border);margin:2rem 0">
+
+      <h3 style="font-size:1rem;margin-bottom:1rem">Background Music</h3>
+      <p style="font-size:0.8rem;color:var(--text-2);margin-bottom:1rem">Ambient background audio for the portfolio. No UI is shown to visitors. Music starts after their first interaction with the page.</p>
+
+      <div class="form-group">
+        <label class="form-label">Music source</label>
+        <select class="form-select" id="cfg-music-type" onchange="toggleMusicFields()">
+          <option value="none">No background music</option>
+          <option value="spotify">Spotify embed</option>
+          <option value="file">Uploaded audio file</option>
+        </select>
+      </div>
+
+      <div id="music-spotify-fields" style="display:none">
+        <div class="form-group">
+          <label class="form-label">Spotify track or playlist URL</label>
+          <input class="form-input" id="cfg-music-spotify-url" placeholder="https://open.spotify.com/track/...">
+          <div class="form-help">Paste any Spotify track, album, or playlist link. It plays as an invisible embed. Visitors hear it after their first click/scroll.</div>
+        </div>
+      </div>
+
+      <div id="music-file-fields" style="display:none">
+        <div class="form-group">
+          <label class="form-label">Upload audio file (MP3, OGG, WAV)</label>
+          <input type="file" id="cfg-music-file" accept="audio/*" class="form-input" onchange="handleMusicUpload(this)" style="padding:0.5rem">
+          <div class="form-help">Keep file under 5MB for fast loading. Loops automatically.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Audio file path (after upload)</label>
+          <input class="form-input" id="cfg-music-file-path" placeholder="audio/background.mp3">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Volume (0.0 to 1.0)</label>
+        <input class="form-input" id="cfg-music-volume" type="number" min="0" max="1" step="0.05" value="0.15">
+        <div class="form-help">0.15 is subtle background level. 0.3 is noticeable. 0.5 is prominent.</div>
+      </div>
+
       <div class="btn-group" style="margin-top:1.5rem">
         <button class="btn btn--primary" onclick="saveSiteConfig()">Save configuration</button>
         <button class="btn" onclick="exportSiteConfig()">Download site-config.json</button>
@@ -3328,16 +3368,24 @@ async function loadSiteConfig() {
   document.getElementById('cfg-resume-url').value = siteConfig.resumeUrl || '';
   document.getElementById('cfg-logo-path').value = siteConfig.logoPath || '';
   document.getElementById('cfg-favicon-path').value = siteConfig.faviconPath || 'icons/favicon.png';
+
+  // Music fields
+  var music = siteConfig.backgroundMusic || {};
+  document.getElementById('cfg-music-type').value = music.type || 'none';
+  document.getElementById('cfg-music-spotify-url').value = music.url && music.type === 'spotify' ? music.url : '';
+  document.getElementById('cfg-music-file-path').value = music.url && music.type === 'file' ? music.url : '';
+  document.getElementById('cfg-music-volume').value = music.volume !== undefined ? music.volume : 0.15;
+  toggleMusicFields();
 }
 
 function handleLogoUpload(input, type) {
-  const file = input.files[0];
+  var file = input.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
+  var reader = new FileReader();
+  reader.onload = function(e) {
     logoFiles[type] = { name: file.name, dataUrl: e.target.result, path: 'icons/' + file.name };
-    const preview = document.getElementById(type + '-preview');
-    const img = document.getElementById(type + '-preview-img');
+    var preview = document.getElementById(type + '-preview');
+    var img = document.getElementById(type + '-preview-img');
     img.src = e.target.result;
     preview.style.display = 'block';
     if (type === 'logo') document.getElementById('cfg-logo-path').value = 'icons/' + file.name;
@@ -3348,11 +3396,45 @@ function handleLogoUpload(input, type) {
   input.value = '';
 }
 
+function toggleMusicFields() {
+  var type = document.getElementById('cfg-music-type').value;
+  document.getElementById('music-spotify-fields').style.display = type === 'spotify' ? '' : 'none';
+  document.getElementById('music-file-fields').style.display = type === 'file' ? '' : 'none';
+}
+
+function handleMusicUpload(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var path = 'audio/' + file.name;
+    document.getElementById('cfg-music-file-path').value = path;
+    // Store for deploy
+    uploadedImages.push({ name: file.name, dataUrl: e.target.result, path: path });
+    toast('Audio file ready: ' + file.name);
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
+}
+
 function saveSiteConfig() {
   siteConfig.gaId = document.getElementById('cfg-ga-id').value.trim();
   siteConfig.resumeUrl = document.getElementById('cfg-resume-url').value.trim();
   siteConfig.logoPath = document.getElementById('cfg-logo-path').value.trim();
   siteConfig.faviconPath = document.getElementById('cfg-favicon-path').value.trim();
+
+  // Music config
+  var musicType = document.getElementById('cfg-music-type').value;
+  var musicUrl = '';
+  if (musicType === 'spotify') musicUrl = document.getElementById('cfg-music-spotify-url').value.trim();
+  else if (musicType === 'file') musicUrl = document.getElementById('cfg-music-file-path').value.trim();
+  siteConfig.backgroundMusic = {
+    type: musicType,
+    url: musicUrl,
+    volume: parseFloat(document.getElementById('cfg-music-volume').value) || 0.15,
+    autoplay: true
+  };
+
   toast('Site config saved. Deploy to apply.');
 }
 

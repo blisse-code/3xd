@@ -136,6 +136,7 @@
     }
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
     html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;font-size:16px}
+    html.scroll-locked,html.scroll-locked body{overflow:hidden!important;height:100%}
     body{font-family:var(--font-body);font-size:var(--text-base);line-height:var(--leading-normal);color:var(--c-text-primary);background:var(--c-bg);-webkit-font-smoothing:antialiased;overflow-x:hidden;max-width:var(--page-max);margin:0 auto}
     ::selection{background:var(--c-accent);color:var(--c-text-inverse)}
     a{color:var(--c-accent);text-decoration:none;transition:color var(--dur-fast) var(--ease-out)}
@@ -792,7 +793,7 @@
 
     async function openCaseDetail(study) {
       caseOverlay.classList.add('active');
-      document.body.style.overflow = 'hidden';
+      document.documentElement.classList.add('scroll-locked');
       caseDetailBody.innerHTML = '<div class="loader"><span class="loader__dot"></span><span class="loader__dot"></span><span class="loader__dot"></span>Loading...</div>';
       try {
         const res = await fetch(study.file);
@@ -841,9 +842,16 @@
       }
     }
 
-    function closeCaseDetail() { caseOverlay.classList.remove('active'); document.body.style.overflow = ''; }
+    function closeCaseDetail() { caseOverlay.classList.remove('active'); document.documentElement.classList.remove('scroll-locked'); }
     caseOverlay.addEventListener('click', (e) => { if (e.target === caseOverlay) closeCaseDetail(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && caseOverlay.classList.contains('active')) closeCaseDetail(); });
+
+    // Safety: if scroll gets stuck, clicking anywhere outside overlay restores it
+    document.addEventListener('click', function() {
+      if (!caseOverlay.classList.contains('active') && document.documentElement.classList.contains('scroll-locked')) {
+        document.documentElement.classList.remove('scroll-locked');
+      }
+    }, { passive: true });
 
     function showFallbackCases() {
       caseLoader.style.display = 'none';
@@ -1054,37 +1062,12 @@
   </script>
   <!-- AI Chat Assistant -->
   <script src="chat-widget.js" defer></script>
-  <!-- Ambient Music (72 BPM) - default OFF -->
-  <script src="ambient-music.js" defer></script>
-  <!-- Sound FX System - default OFF, unified control -->
+  <!-- Background Audio (Spotify embed or uploaded file, no frontend UI) -->
+  <script src="bg-audio.js" defer></script>
+  <!-- Sound FX System - default OFF -->
   <script src="sound-fx.js" defer></script>
   <!-- Motion Design: particles, tilt, image animations, micro-interactions -->
   <script src="motion.js" defer></script>
-  <!-- Calendly inline embed (loaded when site-config has calendlyUrl) -->
-  <script>
-    (function(){
-      fetch('site-config.json').then(function(r){return r.ok?r.json():null}).then(function(cfg){
-        if(!cfg||!cfg.calendlyUrl)return;
-        // Add Calendly popup widget script
-        var s=document.createElement('script');
-        s.src='https://assets.calendly.com/assets/external/widget.js';
-        s.async=true;
-        document.head.appendChild(s);
-        // Make booking buttons open Calendly popup
-        s.onload=function(){
-          document.querySelectorAll('a[href*="calendly.com"]').forEach(function(a){
-            a.addEventListener('click',function(e){
-              e.preventDefault();
-              if(window.Calendly){
-                Calendly.initPopupWidget({url:cfg.calendlyUrl});
-              }else{
-                window.open(cfg.calendlyUrl,'_blank');
-              }
-            });
-          });
-        };
-      }).catch(function(){});
-    })();
-  </script>
+  <!-- Calendly links use target=_blank (opens new tab, no iframe) -->
 </body>
 </html>

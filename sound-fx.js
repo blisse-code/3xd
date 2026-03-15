@@ -167,10 +167,6 @@
 
   // === SOUND CONTROL UI (replaces separate music toggle) ===
   function createUI() {
-    // Override ambient music toggle to be unified
-    var existingMusicBtn = document.querySelector('.amb-toggle');
-    if (existingMusicBtn) existingMusicBtn.remove();
-
     var style = document.createElement('style');
     style.textContent = [
       '.sfx-toggle{position:fixed;bottom:1.5rem;left:1.5rem;z-index:10001;height:36px;border-radius:18px;',
@@ -188,32 +184,20 @@
 
     var btn = document.createElement('button');
     btn.className = 'sfx-toggle' + (soundEnabled ? ' on' : '');
-    btn.setAttribute('aria-label', 'Toggle sounds');
-    btn.title = 'Toggle all sounds';
+    btn.setAttribute('aria-label', 'Toggle interaction sounds');
+    btn.title = 'Toggle interaction sounds';
     btn.innerHTML = '<svg class="sfx-toggle__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
       '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>' +
       '<path d="M15.54 8.46a5 5 0 010 7.07"/>' +
       '<path d="M19.07 4.93a10 10 0 010 14.14"/>' +
       '</svg>' +
-      '<span class="sfx-toggle__label">' + (soundEnabled ? 'Sound on' : 'Sound off') + '</span>';
+      '<span class="sfx-toggle__label">' + (soundEnabled ? 'SFX on' : 'SFX off') + '</span>';
 
     btn.addEventListener('click', function() {
       soundEnabled = !soundEnabled;
       localStorage.setItem(STORAGE_KEY, soundEnabled ? 'true' : 'false');
       btn.classList.toggle('on', soundEnabled);
-      btn.querySelector('.sfx-toggle__label').textContent = soundEnabled ? 'Sound on' : 'Sound off';
-
-      // Also toggle ambient music
-      var ambToggle = document.querySelector('.amb-toggle');
-      if (ambToggle) {
-        if (soundEnabled && !ambToggle.classList.contains('playing')) {
-          ambToggle.click(); // Start music
-        } else if (!soundEnabled && ambToggle.classList.contains('playing')) {
-          ambToggle.click(); // Stop music
-        }
-      }
-
-      // Play confirmation sound
+      btn.querySelector('.sfx-toggle__label').textContent = soundEnabled ? 'SFX on' : 'SFX off';
       if (soundEnabled) playToggle();
     });
 
